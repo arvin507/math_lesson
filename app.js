@@ -1277,12 +1277,16 @@ function loadState() {
     printWeek: 1,
     mentalQuestions: [],
     mentalChecked: false,
+    lessonHomework: {},
     overlapRevealed: false,
   };
 
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    return { ...fallback, ...saved };
+    const merged = { ...fallback, ...saved };
+    merged.lessonHomework =
+      merged.lessonHomework && typeof merged.lessonHomework === "object" ? merged.lessonHomework : {};
+    return merged;
   } catch (error) {
     return fallback;
   }
@@ -1457,6 +1461,7 @@ function renderLesson() {
           ${renderLessonSection("互动提问", renderList(lesson.questions, "plain-list"))}
           ${renderLessonSection("口算热身", renderWarmups(lesson.warmups))}
           ${renderLessonSection("分层练习", renderExercises(lesson.exercises))}
+          ${renderLessonSection("课后作业", renderHomework(lesson))}
           ${renderLessonSection("课后延伸", renderHomeExtension(lesson))}
           ${renderLessonSection("错因提醒", renderList(lesson.mistakeTips, "plain-list"))}
           ${renderLessonSection("复盘表达", `<p>${esc(lesson.reviewPrompt)}</p>`)}
@@ -1574,12 +1579,16 @@ function renderWarmups(items) {
   return `<div class="warmup-grid">${items.map((item) => `<div class="warmup-item">${esc(item)}</div>`).join("")}</div>`;
 }
 
+function exerciseLevelClass(level) {
+  return level === "基础" ? "level-base" : level === "核心" ? "level-core" : "level-challenge";
+}
+
 function renderExercises(exercises) {
   return `
     <div class="exercise-list">
       ${exercises
         .map(([level, question, answer, explanation]) => {
-          const levelClass = level === "基础" ? "level-base" : level === "核心" ? "level-core" : "level-challenge";
+          const levelClass = exerciseLevelClass(level);
           return `
             <article class="exercise">
               <span class="exercise-level ${levelClass}">${esc(level)}</span>
@@ -1593,6 +1602,55 @@ function renderExercises(exercises) {
           `;
         })
         .join("")}
+    </div>
+  `;
+}
+
+function getLessonHomework(lessonId) {
+  const homework = state.lessonHomework?.[String(lessonId)];
+  return Array.isArray(homework) ? homework : [];
+}
+
+function renderHomework(lesson) {
+  const homework = getLessonHomework(lesson.id);
+  const actionLabel = homework.length ? "再生成一批" : "生成作业";
+
+  return `
+    <div class="homework-panel">
+      <div class="homework-toolbar">
+        <div>
+          <span class="homework-kicker">本课方法：${esc(lesson.method)}</span>
+          <strong>随机作业 ${homework.length ? `${homework.length}题` : ""}</strong>
+        </div>
+        <button class="primary-button" type="button" data-generate-homework="${lesson.id}">
+          <svg><use href="#icon-bolt"></use></svg>
+          ${actionLabel}
+        </button>
+      </div>
+      ${
+        homework.length
+          ? `<div class="homework-board">
+              ${homework
+                .map(
+                  (item, index) => `
+                    <article class="homework-item">
+                      <div class="homework-meta">
+                        <span class="exercise-level ${exerciseLevelClass(item.level)}">${esc(item.level)}</span>
+                        <span>第${index + 1}题</span>
+                      </div>
+                      <p>${esc(item.question)}</p>
+                      <details class="answer">
+                        <summary>查看答案解析</summary>
+                        <p><strong>答案：</strong>${esc(item.answer)}</p>
+                        <p>${esc(item.explanation)}</p>
+                      </details>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>`
+          : '<div class="homework-empty">当前还没有生成作业。</div>'
+      }
     </div>
   `;
 }
@@ -1894,6 +1952,824 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function pick(items) {
+  return items[randomInt(0, items.length - 1)];
+}
+
+function levelRank(level) {
+  if (level === "基础") return 0;
+  if (level === "核心") return 1;
+  if (level === "挑战") return 2;
+  return 3;
+}
+
+function levelRange(level, ranges) {
+  return ranges[Math.min(levelRank(level), ranges.length - 1)];
+}
+
+function randomInLevel(level, ranges) {
+  const [min, max] = levelRange(level, ranges);
+  return randomInt(min, max);
+}
+
+function buildHomeworkBatch(lesson) {
+  const levels = ["基础", "基础", "核心", "核心", "核心", "挑战", "挑战", "综合"];
+  const batch = [];
+  const seen = new Set();
+  let attempts = 0;
+
+  while (batch.length < levels.length && attempts < 60) {
+    const item = makeHomeworkQuestion(lesson, levels[batch.length]);
+    attempts += 1;
+    if (seen.has(item.question)) continue;
+    seen.add(item.question);
+    batch.push(item);
+  }
+
+  while (batch.length < levels.length) {
+    batch.push(makeHomeworkQuestion(lesson, levels[batch.length]));
+  }
+
+  return batch;
+}
+
+function makeHomeworkQuestion(lesson, level) {
+  const type = lesson.visualType;
+  const maker =
+    homeworkMakers[type] ||
+    (lesson.ability === "quick"
+      ? homeworkMakers.strategy
+      : lesson.ability === "logic"
+        ? homeworkMakers.logicMix
+        : lesson.ability === "fraction"
+          ? homeworkMakers.fractionTable
+          : homeworkMakers.challenge);
+
+  return { level, ...maker(level) };
+}
+
+function setLessonHomework(lessonId, homework) {
+  if (!state.lessonHomework || typeof state.lessonHomework !== "object") {
+    state.lessonHomework = {};
+  }
+  state.lessonHomework[String(lessonId)] = homework;
+  saveState();
+}
+
+function generateLessonHomework(lessonId = state.currentLessonId) {
+  const lesson = lessonById(lessonId);
+  setLessonHomework(lesson.id, buildHomeworkBatch(lesson));
+  renderLesson();
+  renderPrintSheet();
+}
+
+function addSubHomework(level) {
+  const add = Math.random() > 0.45;
+
+  if (add) {
+    const a = randomInLevel(level, [
+      [32, 86],
+      [126, 398],
+      [268, 698],
+      [386, 798],
+    ]);
+    const b = randomInLevel(level, [
+      [18, 79],
+      [87, 286],
+      [156, 486],
+      [198, 596],
+    ]);
+    const answer = a + b;
+    return {
+      question: `列竖式计算并用减法验算：${a} + ${b} = ?`,
+      answer: String(answer),
+      explanation: `相同数位对齐，算完用${answer}-${b}=${a}验算。`,
+    };
+  }
+
+  const answer = randomInLevel(level, [
+    [24, 78],
+    [128, 328],
+    [226, 528],
+    [318, 628],
+  ]);
+  const b = randomInLevel(level, [
+    [17, 68],
+    [86, 268],
+    [168, 368],
+    [188, 468],
+  ]);
+  const a = answer + b;
+  return {
+    question: `列竖式计算并用加法验算：${a} - ${b} = ?`,
+    answer: String(answer),
+    explanation: `退位后逐位相减，算完用${answer}+${b}=${a}验算。`,
+  };
+}
+
+function arrayHomework(level) {
+  const a = randomInLevel(level, [
+    [2, 5],
+    [3, 8],
+    [6, 9],
+    [6, 9],
+  ]);
+  const b = randomInLevel(level, [
+    [2, 6],
+    [4, 9],
+    [6, 9],
+    [6, 9],
+  ]);
+  const total = a * b;
+
+  if (Math.random() > 0.5) {
+    return {
+      question: `每盒有${a}支彩笔，${b}盒一共有多少支？请写乘法算式。`,
+      answer: `${total}支，${a}×${b}=${total}`,
+      explanation: `${b}盒就是${b}个${a}，可以用乘法合并。`,
+    };
+  }
+
+  return {
+    question: `${total}颗糖，每袋装${a}颗，可以装几袋？请写除法算式。`,
+    answer: `${b}袋，${total}÷${a}=${b}`,
+    explanation: `这是在问${total}里面有几个${a}，乘除用同一组三个数。`,
+  };
+}
+
+function mixedOrderHomework(level) {
+  const a = randomInLevel(level, [
+    [6, 20],
+    [8, 36],
+    [18, 58],
+    [24, 72],
+  ]);
+  const b = randomInLevel(level, [
+    [2, 5],
+    [2, 8],
+    [3, 9],
+    [4, 9],
+  ]);
+  const c = randomInLevel(level, [
+    [2, 6],
+    [3, 8],
+    [4, 9],
+    [4, 9],
+  ]);
+  const templates = [
+    {
+      question: `${a} + ${b} × ${c} = ?`,
+      answer: String(a + b * c),
+      explanation: `先算${b}×${c}=${b * c}，再算${a}+${b * c}。`,
+    },
+    {
+      question: `(${a} + ${b}) × ${c} = ?`,
+      answer: String((a + b) * c),
+      explanation: `括号先算${a}+${b}=${a + b}，再乘${c}。`,
+    },
+    {
+      question: `${a + b * c} - ${b} × ${c} = ?`,
+      answer: String(a),
+      explanation: `先算乘法${b}×${c}=${b * c}，再从${a + b * c}里减去它。`,
+    },
+    {
+      question: `${b * c} ÷ ${b} + ${a} = ?`,
+      answer: String(c + a),
+      explanation: `先算${b * c}÷${b}=${c}，再加${a}。`,
+    },
+  ];
+  return pick(templates);
+}
+
+function detectiveHomework(level) {
+  const type = pick(["add", "mul", "order"]);
+
+  if (type === "add") {
+    const a = randomInLevel(level, [
+      [24, 68],
+      [36, 89],
+      [128, 398],
+      [248, 598],
+    ]);
+    const b = randomInLevel(level, [
+      [17, 58],
+      [27, 78],
+      [86, 286],
+      [126, 386],
+    ]);
+    const answer = a + b;
+    const wrong = answer - 10;
+    return {
+      question: `判断并改错：${a} + ${b} = ${wrong}。错在哪里？`,
+      answer: `错误，正确是${answer}`,
+      explanation: `重点检查个位进位，进到十位的1不能漏掉。`,
+    };
+  }
+
+  if (type === "mul") {
+    const a = randomInLevel(level, [
+      [2, 6],
+      [4, 9],
+      [6, 9],
+      [6, 9],
+    ]);
+    const b = randomInLevel(level, [
+      [2, 6],
+      [4, 9],
+      [6, 9],
+      [6, 9],
+    ]);
+    const answer = a * b;
+    const wrong = answer + a;
+    return {
+      question: `判断并改错：${a} × ${b} = ${wrong}。错在哪里？`,
+      answer: `错误，正确是${answer}`,
+      explanation: `先回到乘法口诀核对，再看是不是多加了一组。`,
+    };
+  }
+
+  const a = randomInLevel(level, [
+    [5, 14],
+    [5, 18],
+    [12, 36],
+    [18, 48],
+  ]);
+  const b = randomInLevel(level, [
+    [2, 5],
+    [2, 8],
+    [3, 9],
+    [4, 9],
+  ]);
+  const c = randomInLevel(level, [
+    [2, 6],
+    [3, 7],
+    [4, 9],
+    [4, 9],
+  ]);
+  return {
+    question: `判断并改错：${a} + ${b} × ${c} = ${(a + b) * c}。错在哪里？`,
+    answer: `错误，正确是${a + b * c}`,
+    explanation: `混合运算要先算乘法${b}×${c}=${b * c}，不能先算前面的加法。`,
+  };
+}
+
+function makeComplements(target = 100) {
+  const a = randomInt(18, target - 18);
+  return [a, target - a];
+}
+
+function makeRoundingAddHomework(level) {
+  const targets = [
+    [100],
+    [100, 200],
+    [100, 200, 300],
+    [200, 300, 500],
+  ][Math.min(levelRank(level), 3)];
+  const target = pick(targets);
+  const [a, b] = makeComplements(target);
+  const c = randomInLevel(level, [
+    [12, 48],
+    [16, 89],
+    [68, 168],
+    [96, 286],
+  ]);
+  const order = Math.random() > 0.5 ? [a, c, b] : [c, a, b];
+  return {
+    question: `${order.join(" + ")} = ?`,
+    answer: String(target + c),
+    explanation: `先圈出${a}和${b}，它们能凑成${target}，再加剩下的${c}。`,
+  };
+}
+
+function compensationHomework(level) {
+  const rounds = [
+    [50, 100],
+    [100, 200],
+    [100, 200, 300],
+    [200, 300, 500],
+  ][Math.min(levelRank(level), 3)];
+  const round = pick(rounds);
+  const delta = randomInLevel(level, [
+    [1, 3],
+    [1, 7],
+    [2, 9],
+    [2, 12],
+  ]);
+  const below = Math.random() > 0.35;
+  const sub = below ? round - delta : round + delta;
+  const a = round + randomInLevel(level, [
+    [22, 90],
+    [45, 180],
+    [88, 260],
+    [126, 360],
+  ]);
+  const answer = a - sub;
+  return {
+    question: `${a} - ${sub} = ? 请写出补偿过程。`,
+    answer: String(answer),
+    explanation: below
+      ? `先算${a}-${round}=${a - round}，多减了${delta}，要加回${delta}。`
+      : `先算${a}-${round}=${a - round}，还少减${delta}，要再减${delta}。`,
+  };
+}
+
+function splitMultiplyHomework(level) {
+  const a = randomInLevel(level, [
+    [3, 6],
+    [4, 9],
+    [6, 12],
+    [8, 16],
+  ]);
+  let b = randomInLevel(level, [
+    [11, 16],
+    [12, 29],
+    [18, 39],
+    [24, 49],
+  ]);
+  if (b % 10 === 0) b += 3;
+  const tens = Math.floor(b / 10) * 10;
+  const ones = b - tens;
+  return {
+    question: `${a} × ${b} = ? 请写一种拆分过程。`,
+    answer: String(a * b),
+    explanation: `把${b}拆成${tens}+${ones}，${a}×${tens}+${a}×${ones}=${a * tens}+${a * ones}=${a * b}。`,
+  };
+}
+
+function strategyHomework(level) {
+  const maker = pick([
+    () => {
+      const item = makeRoundingAddHomework(level);
+      return { ...item, answer: `凑整，${item.answer}`, explanation: `适合先凑整。${item.explanation}` };
+    },
+    () => {
+      const item = compensationHomework(level);
+      return { ...item, answer: `补偿，${item.answer}`, explanation: `减数接近整十整百，适合补偿。${item.explanation}` };
+    },
+    () => {
+      const item = splitMultiplyHomework(level);
+      return { ...item, answer: `拆分，${item.answer}`, explanation: `乘法中有难数，适合拆成整十和个位。${item.explanation}` };
+    },
+  ]);
+  const item = maker();
+  return {
+    question: `${item.question} 先判断适合用什么方法。`,
+    answer: item.answer,
+    explanation: item.explanation,
+  };
+}
+
+function storyCardsHomework(level) {
+  const start = randomInLevel(level, [
+    [18, 42],
+    [24, 68],
+    [48, 128],
+    [68, 168],
+  ]);
+  const give = randomInLevel(level, [
+    [4, 12],
+    [6, 19],
+    [12, 38],
+    [18, 58],
+  ]);
+  const buy = randomInLevel(level, [
+    [5, 14],
+    [8, 24],
+    [16, 46],
+    [22, 68],
+  ]);
+  return {
+    question: `小红有${start}张贴纸，送给妹妹${give}张，又买来${buy}张。现在有多少张？请先圈条件词。`,
+    answer: `${start - give + buy}张`,
+    explanation: `按事情顺序先减少再增加：${start}-${give}+${buy}=${start - give + buy}。`,
+  };
+}
+
+function vennHomework(level) {
+  const both = randomInLevel(level, [
+    [2, 5],
+    [3, 9],
+    [5, 14],
+    [6, 18],
+  ]);
+  const onlyA = randomInLevel(level, [
+    [4, 10],
+    [7, 18],
+    [10, 26],
+    [14, 34],
+  ]);
+  const onlyB = randomInLevel(level, [
+    [4, 10],
+    [6, 17],
+    [10, 26],
+    [14, 34],
+  ]);
+  const a = onlyA + both;
+  const b = onlyB + both;
+  const total = onlyA + onlyB + both;
+
+  if (Math.random() > 0.35) {
+    return {
+      question: `会跳绳${a}人，会拍球${b}人，两样都会${both}人，至少会一样的有多少人？`,
+      answer: `${total}人`,
+      explanation: `${a}+${b}把两样都会的人算了两次，所以要减${both}。`,
+    };
+  }
+
+  return {
+    question: `全班${total}人都会至少一种活动，会跳绳${a}人，会拍球${b}人，两样都会几人？`,
+    answer: `${both}人`,
+    explanation: `${a}+${b}-${total}=${both}，多出来的就是重复数的人。`,
+  };
+}
+
+function puzzleHomework(level) {
+  if (Math.random() > 0.45) {
+    const count = randomInLevel(level, [
+      [3, 4],
+      [4, 7],
+      [6, 10],
+      [8, 12],
+    ]);
+    return {
+      question: `${count}个小正方形排成一条长条，面积是多少小格？周长是多少条小边？`,
+      answer: `面积${count}小格，周长${count * 2 + 2}条小边`,
+      explanation: `面积看小格数量；长条上下各${count}条，左右各1条。`,
+    };
+  }
+
+  const width = randomInLevel(level, [
+    [2, 3],
+    [2, 5],
+    [3, 7],
+    [4, 8],
+  ]);
+  const height = randomInLevel(level, [
+    [2, 3],
+    [2, 4],
+    [3, 5],
+    [3, 6],
+  ]);
+  return {
+    question: `一个${height}行${width}列的小方格长方形，面积和周长分别是多少？`,
+    answer: `面积${width * height}小格，周长${2 * (width + height)}条小边`,
+    explanation: `面积是${height}×${width}，周长只数外面一圈。`,
+  };
+}
+
+function cubesHomework(level) {
+  const columns = levelRank(level) >= 2 ? randomInt(3, 4) : Math.random() > 0.5 ? 2 : 3;
+  const front = Array.from({ length: columns }, () =>
+    randomInLevel(level, [
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [1, 5],
+    ]),
+  );
+  const back = Array.from({ length: columns }, () =>
+    randomInLevel(level, [
+      [1, 3],
+      [1, 4],
+      [2, 5],
+      [2, 6],
+    ]),
+  );
+  const view = front.map((value, index) => Math.max(value, back[index]));
+  return {
+    question: `积木有前后两排，前排高度是${front.join("、")}，后排高度是${back.join("、")}。从前面看各列高度是多少？`,
+    answer: `${view.join("、")}`,
+    explanation: `从前面看同一列的最高高度，后面的高积木可能露出来。`,
+  };
+}
+
+function wholeFractionHomework(level) {
+  if (Math.random() > 0.45) {
+    const people = pick(levelRank(level) >= 2 ? [3, 4, 6, 8] : [2, 3, 4, 6]);
+    const each = randomInLevel(level, [
+      [1, 4],
+      [2, 8],
+      [4, 12],
+      [6, 16],
+    ]);
+    const total = people * each;
+    return {
+      question: `${total}块饼干平均分给${people}人，每人几块？`,
+      answer: `${each}块`,
+      explanation: `平均分要求每人一样多，${total}÷${people}=${each}。`,
+    };
+  }
+
+  const parts = pick(levelRank(level) >= 2 ? [3, 4, 6, 8] : [2, 3, 4]);
+  return {
+    question: `一个圆被切成${parts}块，但每块大小不一样。每一块都能叫1/${parts}吗？`,
+    answer: "不能",
+    explanation: `分数必须平均分，只是分成${parts}块还不够。`,
+  };
+}
+
+function unitFractionHomework(level) {
+  const denominators = levelRank(level) >= 2 ? [2, 3, 4, 5, 6, 8, 10] : [2, 3, 4, 6, 8];
+  const a = pick(denominators);
+  let b = pick(denominators);
+  while (b === a) b = pick(denominators);
+  const larger = a < b ? `1/${a}` : `1/${b}`;
+  return {
+    question: `同样大的纸带，1/${a}和1/${b}哪一份更大？`,
+    answer: `${larger}更大`,
+    explanation: `整体一样时，分母越大表示分得越细，每一份反而越小。`,
+  };
+}
+
+function fractionPartsHomework(level) {
+  const denominator = pick(levelRank(level) >= 2 ? [4, 5, 6, 8, 10, 12] : [3, 4, 5, 6, 8]);
+  const maxNumerator = levelRank(level) >= 2 ? denominator : denominator - 1;
+  const numerator = randomInt(1, maxNumerator);
+  return {
+    question: `一条纸带平均分成${denominator}份，涂色${numerator}份，用分数表示。`,
+    answer: `${numerator}/${denominator}`,
+    explanation: `分母看总份数${denominator}，分子看涂色份数${numerator}。`,
+  };
+}
+
+function lifeFractionHomework(level) {
+  const templates = [
+    {
+      question: "1小时的1/2是多少分钟？",
+      answer: "30分钟",
+      explanation: "1小时是60分钟，平均分成2份，每份30分钟。",
+    },
+    {
+      question: "1米的1/4是多少厘米？",
+      answer: "25厘米",
+      explanation: "1米是100厘米，100平均分成4份，每份25厘米。",
+    },
+    {
+      question: "24支彩笔的1/3是多少支？",
+      answer: "8支",
+      explanation: "把24支平均分成3份，每份8支。",
+    },
+    {
+      question: "半杯水倒两次，正好是多少杯？",
+      answer: "1杯",
+      explanation: "两个1/2合起来是一个完整整体。",
+    },
+  ];
+  if (levelRank(level) >= 2) {
+    templates.push(
+      {
+        question: "2米的1/4是多少厘米？",
+        answer: "50厘米",
+        explanation: "2米是200厘米，200平均分成4份，每份50厘米。",
+      },
+      {
+        question: "36颗糖的3/4是多少颗？",
+        answer: "27颗",
+        explanation: "36平均分成4份，每份9颗，取3份是27颗。",
+      },
+    );
+  }
+  return pick(templates);
+}
+
+function tableHomework(level) {
+  const values = [
+    randomInLevel(level, [
+      [3, 9],
+      [5, 12],
+      [8, 24],
+      [12, 36],
+    ]),
+    randomInLevel(level, [
+      [4, 10],
+      [6, 14],
+      [9, 26],
+      [12, 38],
+    ]),
+    randomInLevel(level, [
+      [5, 11],
+      [7, 15],
+      [10, 28],
+      [14, 40],
+    ]),
+  ];
+  const days = ["周一", "周二", "周三"];
+  const total = values.reduce((sum, value) => sum + value, 0);
+  const max = Math.max(...values);
+  const maxDays = days.filter((_, index) => values[index] === max);
+  const askTotal = Math.random() > 0.4;
+  return {
+    question: `阅读记录表：周一${values[0]}本，周二${values[1]}本，周三${values[2]}本。${askTotal ? "三天一共读多少本？" : "哪天读得最多？"}`,
+    answer: askTotal ? `${total}本` : `${maxDays.join("和")}${maxDays.length > 1 ? "并列最多" : "最多"}`,
+    explanation: askTotal ? `${values.join("+")}=${total}，单位是本。` : `比较三个数据，最大值是${max}，对应${maxDays.join("和")}。`,
+  };
+}
+
+function barsHomework(level) {
+  const run = randomInLevel(level, [
+    [6, 14],
+    [10, 22],
+    [16, 36],
+    [20, 48],
+  ]);
+  const rope = randomInLevel(level, [
+    [8, 16],
+    [12, 24],
+    [18, 38],
+    [22, 50],
+  ]);
+  const ball = randomInLevel(level, [
+    [5, 14],
+    [8, 20],
+    [14, 34],
+    [18, 46],
+  ]);
+  if (Math.random() > 0.45) {
+    const diff = Math.abs(rope - ball);
+    const more = diff === 0 ? "两项一样多" : `${rope > ball ? "跳绳" : "拍球"}更多`;
+    return {
+      question: `条形图数据：跑步${run}人，跳绳${rope}人，拍球${ball}人。跳绳和拍球相差几人？`,
+      answer: `${diff}人，${more}`,
+      explanation: `比较两条条形长度，用大数减小数：${Math.max(rope, ball)}-${Math.min(rope, ball)}=${diff}。`,
+    };
+  }
+  return {
+    question: `条形图数据：跑步${run}人，跳绳${rope}人，拍球${ball}人。一共有多少人次？`,
+    answer: `${run + rope + ball}人次`,
+    explanation: `求合计要把三项数据相加：${run}+${rope}+${ball}=${run + rope + ball}。`,
+  };
+}
+
+function segmentHomework(level) {
+  const base = randomInLevel(level, [
+    [12, 28],
+    [24, 48],
+    [36, 96],
+    [58, 128],
+  ]);
+  const diff = randomInLevel(level, [
+    [3, 9],
+    [5, 16],
+    [8, 28],
+    [12, 38],
+  ]);
+  if (Math.random() > 0.45) {
+    return {
+      question: `小明有${base}张卡片，小红比小明多${diff}张。小红有多少张？`,
+      answer: `${base + diff}张`,
+      explanation: `小红的线段比小明长${diff}，所以${base}+${diff}=${base + diff}。`,
+    };
+  }
+  return {
+    question: `小明有${base}张卡片，小红比小明多${diff}张。两人一共有多少张？`,
+    answer: `${base * 2 + diff}张`,
+    explanation: `先求小红${base}+${diff}=${base + diff}，再合起来${base}+${base + diff}=${base * 2 + diff}。`,
+  };
+}
+
+function patternHomework(level) {
+  const type = pick(["add", "double", "repeat"]);
+  if (type === "add") {
+    const start = randomInLevel(level, [
+      [1, 6],
+      [1, 8],
+      [4, 18],
+      [8, 28],
+    ]);
+    const step = randomInLevel(level, [
+      [2, 4],
+      [2, 6],
+      [4, 12],
+      [6, 18],
+    ]);
+    const seq = Array.from({ length: 4 }, (_, index) => start + step * index);
+    return {
+      question: `${seq.join("、")}、? 下一个数是多少？`,
+      answer: String(start + step * 4),
+      explanation: `每次加${step}。`,
+    };
+  }
+  if (type === "double") {
+    const start = randomInLevel(level, [
+      [2, 3],
+      [2, 5],
+      [3, 8],
+      [4, 10],
+    ]);
+    const seq = Array.from({ length: 4 }, (_, index) => start * 2 ** index);
+    return {
+      question: `${seq.join("、")}、? 下一个数是多少？`,
+      answer: String(start * 2 ** 4),
+      explanation: "每次乘2。",
+    };
+  }
+  const colors = ["红", "蓝", "蓝"];
+  const position = randomInLevel(level, [
+    [4, 8],
+    [6, 14],
+    [12, 26],
+    [18, 38],
+  ]);
+  return {
+    question: `珠子按“${colors.join("、")}”重复排列，第${position}颗是什么颜色？`,
+    answer: `${colors[(position - 1) % colors.length]}色`,
+    explanation: `每3颗一组，先看第${position}颗在这一组里的第几个。`,
+  };
+}
+
+function calculationChallengeHomework(level) {
+  return pick([addSubHomework, mixedOrderHomework, makeRoundingAddHomework, compensationHomework, splitMultiplyHomework])(level);
+}
+
+function logicMixHomework(level) {
+  return pick([storyCardsHomework, vennHomework, puzzleHomework, cubesHomework])(level);
+}
+
+function fractionTableHomework(level) {
+  if (Math.random() > 0.45) {
+    const denominator = pick(levelRank(level) >= 2 ? [3, 4, 6, 8] : [2, 3, 4]);
+    const part = randomInLevel(level, [
+      [2, 5],
+      [4, 8],
+      [6, 12],
+      [8, 16],
+    ]);
+    const total = denominator * part;
+    const numerator = levelRank(level) === 0 ? 1 : randomInt(1, denominator - 1);
+    return {
+      question: `${total}名同学中，${numerator}/${denominator}选择跳绳，有多少人？`,
+      answer: `${part * numerator}人`,
+      explanation: `先把${total}平均分成${denominator}份，每份${part}人，再取${numerator}份。`,
+    };
+  }
+  return tableHomework(level);
+}
+
+function projectHomework(level) {
+  const topics = [
+    {
+      name: "口算抽卡",
+      task: "写4张题卡，并在背面写答案。",
+      answer: "题卡有题目、答案和一种检查方法即可。",
+    },
+    {
+      name: "分数披萨",
+      task: "画一个平均分的披萨题，写清整体1和涂色分数。",
+      answer: "规则中要说清平均分成几份、取了几份。",
+    },
+    {
+      name: "重叠圈圈",
+      task: "设计一道两类活动有重叠的人数题，并画两个圈。",
+      answer: "答案要用两边总数减去重复人数。",
+    },
+    {
+      name: "找规律串珠",
+      task: "设计一串重复规律，至少问到第8颗。",
+      answer: "答案要说明一组有几颗，以及目标位置在第几组。",
+    },
+  ];
+  if (levelRank(level) >= 2) {
+    topics.push({
+      name: "综合闯关",
+      task: "把口算、分数、重叠三类题放进同一个小游戏，并写一条计分规则。",
+      answer: "规则要能让玩家知道先做什么、答完怎样检查、错题怎样提示。",
+    });
+  }
+  const topic = pick(topics);
+  return {
+    question: `设计“${topic.name}”小游戏：${topic.task}`,
+    answer: topic.answer,
+    explanation: "项目题重点看规则是否清楚、答案是否能讲明白。",
+  };
+}
+
+const homeworkMakers = {
+  place: addSubHomework,
+  array: arrayHomework,
+  stairs: mixedOrderHomework,
+  detective: detectiveHomework,
+  blocks: makeRoundingAddHomework,
+  numberline: compensationHomework,
+  split: splitMultiplyHomework,
+  strategy: strategyHomework,
+  cards: storyCardsHomework,
+  venn: vennHomework,
+  puzzle: puzzleHomework,
+  cubes: cubesHomework,
+  whole: wholeFractionHomework,
+  unitFraction: unitFractionHomework,
+  fractionParts: fractionPartsHomework,
+  lifeFraction: lifeFractionHomework,
+  table: tableHomework,
+  bars: barsHomework,
+  segment: segmentHomework,
+  pattern: patternHomework,
+  challenge: calculationChallengeHomework,
+  logicMix: logicMixHomework,
+  fractionTable: fractionTableHomework,
+  project: projectHomework,
+};
+
 function makeMentalQuestion(mode) {
   const type = mode === "mixed" ? ["add", "sub", "mul", "div", "two"][randomInt(0, 4)] : mode;
 
@@ -2113,20 +2989,24 @@ function renderPrintSheet() {
     <div class="print-lessons">
       ${weekLessons
         .map(
-          (lesson) => `
-            <section class="print-lesson">
-              <h2>第${lesson.number}课：${esc(lesson.title)}</h2>
-              <p><strong>目标：</strong>${esc(lesson.goal)}</p>
-              <ol class="ordered-list">
-                ${lesson.warmups.slice(0, 3).map((item) => `<li>${esc(item)} = </li>`).join("")}
-                ${lesson.exercises.map((exercise) => `<li>${esc(exercise[1])}</li>`).join("")}
-              </ol>
-              <div class="answer-lines">
-                <span></span><span></span><span></span>
-              </div>
-              <p><strong>复盘：</strong>${esc(lesson.reviewPrompt)}</p>
-            </section>
-          `,
+          (lesson) => {
+            const homework = getLessonHomework(lesson.id);
+            const practiceItems = homework.length ? homework.map((item) => item.question) : lesson.exercises.map((exercise) => exercise[1]);
+            return `
+              <section class="print-lesson">
+                <h2>第${lesson.number}课：${esc(lesson.title)}</h2>
+                <p><strong>目标：</strong>${esc(lesson.goal)}</p>
+                <ol class="ordered-list">
+                  ${lesson.warmups.slice(0, 3).map((item) => `<li>${esc(item)} = </li>`).join("")}
+                  ${practiceItems.map((item) => `<li>${esc(item)}</li>`).join("")}
+                </ol>
+                <div class="answer-lines">
+                  <span></span><span></span><span></span>
+                </div>
+                <p><strong>复盘：</strong>${esc(lesson.reviewPrompt)}</p>
+              </section>
+            `;
+          },
         )
         .join("")}
     </div>
@@ -2156,10 +3036,17 @@ function bindEvents() {
   });
 
   $("#lessonDetail").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-lesson-nav]");
-    if (!button) return;
-    const offset = button.dataset.lessonNav === "next" ? 1 : -1;
-    goToLesson(state.currentLessonId + offset);
+    const navButton = event.target.closest("[data-lesson-nav]");
+    if (navButton) {
+      const offset = navButton.dataset.lessonNav === "next" ? 1 : -1;
+      goToLesson(state.currentLessonId + offset);
+      return;
+    }
+
+    const homeworkButton = event.target.closest("[data-generate-homework]");
+    if (homeworkButton) {
+      generateLessonHomework(homeworkButton.dataset.generateHomework);
+    }
   });
 
   $("#generateMental").addEventListener("click", generateMentalPractice);

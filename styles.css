@@ -690,6 +690,72 @@ details.answer summary {
   cursor: pointer;
 }
 
+.homework-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.homework-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.homework-toolbar > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.homework-toolbar strong {
+  color: var(--ink);
+}
+
+.homework-kicker {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.homework-board {
+  display: grid;
+  gap: 10px;
+}
+
+.homework-item {
+  padding: 14px;
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.homework-item p {
+  margin: 8px 0 0;
+}
+
+.homework-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.homework-empty {
+  padding: 16px;
+  color: var(--muted);
+  background: #fbfcfd;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
 details.answer p {
   margin: 8px 0 0;
   color: var(--muted);
@@ -1639,6 +1705,11 @@ details.answer p {
   .mistake-form,
   .mistake-row {
     grid-template-columns: 1fr;
+  }
+
+  .homework-toolbar {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
