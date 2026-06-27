@@ -1633,6 +1633,7 @@ function renderLesson() {
           ${renderLessonSection("图形实验", `${renderVisual(lesson)}${renderVisualTasks(lesson)}`)}
           ${renderLessonSection("跟画例题", renderWorkedExample(lesson))}
           ${renderLessonSection("独立闯关", renderPracticeSets(lesson.upgraded.practiceSets))}
+          ${renderLessonSection("备用练习题池", renderExtraPractice(lesson.upgraded.extraPractice))}
           ${renderLessonSection("随机作业", renderHomework(lesson))}
         </section>
         <aside class="studio-side">
@@ -1911,6 +1912,59 @@ function renderPracticeSets(items) {
         })
         .join("")}
     </div>
+  `;
+}
+
+function renderExtraPractice(extraPractice) {
+  const groups = [
+    ["基础巩固", extraPractice.base],
+    ["核心迁移", extraPractice.core],
+    ["易错判断", extraPractice.mistake],
+    ["表达讲题", extraPractice.explain],
+  ];
+
+  return `
+    <div class="extra-practice">
+      <div class="extra-practice-note">
+        <strong>按孩子状态选做</strong>
+        <span>状态一般做基础巩固；状态好做核心迁移和挑战；已经会了就做表达讲题。</span>
+      </div>
+      ${groups
+        .map(
+          ([title, items]) => `
+            <section class="extra-group">
+              <h3>${esc(title)}</h3>
+              <div class="extra-card-grid">
+                ${items.map((item) => renderExtraPracticeItem(item)).join("")}
+              </div>
+            </section>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderExtraPracticeItem(item) {
+  return `
+    <article class="extra-card">
+      <div class="practice-head">
+        <span class="exercise-level ${exerciseLevelClass(item.level)}">${esc(item.level)}</span>
+        <span class="tag">${esc(item.diagramType)}</span>
+      </div>
+      <p>${esc(item.question)}</p>
+      <div class="draw-hint">
+        <strong>先画图：</strong>${esc(item.drawHint)}
+      </div>
+      <div class="reasoning-prompt">
+        ${esc(item.reasoningPrompt)}
+      </div>
+      <details class="answer">
+        <summary>查看答案解析</summary>
+        <p><strong>答案：</strong>${esc(item.answer)}</p>
+        <p>${esc(item.explanation)}</p>
+      </details>
+    </article>
   `;
 }
 

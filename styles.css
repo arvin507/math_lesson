@@ -1030,6 +1030,62 @@ details.answer p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.extra-practice {
+  display: grid;
+  gap: 16px;
+}
+
+.extra-practice-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  background: #f8fbf6;
+  border: 1px solid #c1e4d0;
+  border-radius: var(--radius);
+}
+
+.extra-practice-note strong {
+  color: var(--green);
+}
+
+.extra-practice-note span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.extra-group {
+  display: grid;
+  gap: 10px;
+}
+
+.extra-group h3 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.extra-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.extra-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.extra-card p {
+  margin: 0;
+}
+
 .practice-head {
   display: flex;
   flex-wrap: wrap;
@@ -2067,7 +2123,8 @@ details.answer p {
 
   .studio-map,
   .visual-task-grid,
-  .practice-set-list {
+  .practice-set-list,
+  .extra-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2144,6 +2201,7 @@ details.answer p {
   .studio-map,
   .visual-task-grid,
   .practice-set-list,
+  .extra-card-grid,
   .warmup-grid,
   .print-meta {
     grid-template-columns: 1fr;

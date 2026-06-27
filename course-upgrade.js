@@ -339,6 +339,97 @@ const MathCourseUpgrade = (() => {
     return [...base, transfer];
   }
 
+  function decoratePractice(item, lesson, category) {
+    const diagram = diagramFor(lesson);
+    const childGuide = childGuideFor(lesson);
+    return {
+      category,
+      diagramType: diagram.tool,
+      drawHint: diagram.drawPrompt,
+      reasoningPrompt: category === "易错判断" ? childGuide.watch : childGuide.slogan,
+      ...item,
+    };
+  }
+
+  function buildExtraPractice(lesson) {
+    const baseExercise = lesson.exercises.find((exercise) => exercise[0] === "基础") || lesson.exercises[0];
+    const coreExercise = lesson.exercises.find((exercise) => exercise[0] === "核心") || lesson.exercises[1] || lesson.exercises[0];
+    const challengeExercise = lesson.exercises.find((exercise) => exercise[0] === "挑战") || lesson.exercises[2] || coreExercise;
+    const diagram = diagramFor(lesson);
+    const childGuide = childGuideFor(lesson);
+
+    return {
+      base: [
+        decoratePractice(
+          {
+            level: "基础巩固",
+            question: `${baseExercise[1]} 做完后，把题目中的数量标到${diagram.tool}上。`,
+            answer: baseExercise[2],
+            explanation: `${baseExercise[3]} 这题重点是先把基础关系画清楚。`,
+          },
+          lesson,
+          "基础巩固",
+        ),
+        decoratePractice(
+          {
+            level: "基础巩固",
+            question: `换一组小一点的数字，仿照“${baseExercise[1]}”再做一题。`,
+            answer: "开放题：数字合理、图和算式一致即可。",
+            explanation: "基础巩固题重点是方法稳定，不追求难度。",
+          },
+          lesson,
+          "基础巩固",
+        ),
+      ],
+      core: [
+        decoratePractice(
+          {
+            level: "核心迁移",
+            question: `${coreExercise[1]} 请先写“我为什么选${diagram.tool}”，再列式。`,
+            answer: coreExercise[2],
+            explanation: `${coreExercise[3]} 迁移时要把选图理由说出来。`,
+          },
+          lesson,
+          "核心迁移",
+        ),
+        decoratePractice(
+          {
+            level: "核心迁移",
+            question: `把“${challengeExercise[1]}”改成家里暑假场景，比如读书打卡、零花钱、游泳课或积木收纳，再画图解答。`,
+            answer: "开放题：情境合理、数量关系不变、答案能用图解释即可。",
+            explanation: "生活化迁移能帮助孩子把方法带到新题里。",
+          },
+          lesson,
+          "核心迁移",
+        ),
+      ],
+      mistake: [
+        decoratePractice(
+          {
+            level: "易错判断",
+            question: `判断：有人做“${coreExercise[1]}”时没有画图，直接套算式，结果和图上的关系对不上。请找出可能错在哪里，并改正。`,
+            answer: "重点检查条件是否漏读、关系是否画反、算式中的数是否都能在图上找到。",
+            explanation: `这类错题要盯住：${childGuide.watch}`,
+          },
+          lesson,
+          "易错判断",
+        ),
+      ],
+      explain: [
+        decoratePractice(
+          {
+            level: "表达讲题",
+            question: `像${childGuide.role}一样讲给家人听：今天为什么要用${diagram.tool}？它帮我看清了什么？`,
+            answer: "开放题：能说出选图理由、图上的关键数量、对应算式即可。",
+            explanation: childGuide.tryThis,
+          },
+          lesson,
+          "表达讲题",
+        ),
+      ],
+    };
+  }
+
   function buildSelfCheck(lesson) {
     const diagram = diagramFor(lesson);
     const childGuide = childGuideFor(lesson);
@@ -367,6 +458,7 @@ const MathCourseUpgrade = (() => {
       steps: buildSteps(lesson),
       visualTasks: buildVisualTasks(lesson),
       practiceSets: buildPracticeSets(lesson),
+      extraPractice: buildExtraPractice(lesson),
       selfCheck: buildSelfCheck(lesson),
       parentOptional: buildParentOptional(lesson),
       childGuide: childGuideFor(lesson),
