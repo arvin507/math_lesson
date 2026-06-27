@@ -170,6 +170,38 @@ const MathCourseUpgrade = (() => {
     },
   };
 
+
+  const childLessonGuides = [
+    { role: "小票侦探", slogan: "数位先站队，算完倒着查。", mission: "帮小票算出总价，再用减法倒着检查。", watch: "个位、十位、百位不能串门，进位退位要留下记号。", tryThis: "给自己出一道三位数加减题，写出一条验算路线。" },
+    { role: "点阵摆盘师", slogan: "一张点阵，讲出一乘两除。", mission: "把几个几摆整齐，再从同一张图里找乘法和除法。", watch: "先分清题目问的是每份几个，还是一共有几份。", tryThis: "用 24 个点画一张图，说出 3 道相关算式。" },
+    { role: "符号排队员", slogan: "括号最先走，乘除排前头。", mission: "给每个运算符号排队，再一步一步算。", watch: "不要看到前面的加减就先算，先找括号和乘除。", tryThis: "把同一组数字加上不同括号，比较结果怎么变。" },
+    { role: "错因侦探", slogan: "不说粗心，说出证据。", mission: "给错题贴上错因标签，再写出正确第一步。", watch: "错因要具体到符号、数位、口诀或顺序。", tryThis: "把今天一道错题做成‘案件卡’，正面写错题，背面写证据。" },
+    { role: "凑整搬运工", slogan: "先找好朋友，凑整再计算。", mission: "把能凑成整十整百的数搬到一起。", watch: "搬家只换位置，不能漏掉剩下的数。", tryThis: "找两组能凑整的数字朋友，编一道四个数连加题。" },
+    { role: "数轴导航员", slogan: "多走要退回，少走要补上。", mission: "在数轴上先跳到整十整百，再做补偿小跳。", watch: "每次都要说清是多减了还是少减了。", tryThis: "画一条数轴解释 304-197，箭头上写出补偿理由。" },
+    { role: "面积切块师", slogan: "难数拆开算，分块再合并。", mission: "把难乘法切成整十块和零头块。", watch: "每一块都要算，最后别忘了合起来。", tryThis: "用长方形图解释 8×23，也可以试试另一种拆法。" },
+    { role: "算法路线师", slogan: "先观察，再选路；不硬套。", mission: "给每道题选择最省力的路线，并说理由。", watch: "如果巧算更麻烦，就老老实实计算。", tryThis: "同一道题写两种算法，圈出你觉得更省力的一种。" },
+    { role: "题目整理师", slogan: "先收拾题目，再列式。", mission: "圈数字、画单位、框关系词，把问题找出来。", watch: "不要看见两个数字就急着加减，先看谁和谁比。", tryThis: "把一道文字题改成条件卡片，再重新排列讲给别人听。" },
+    { role: "重叠圈圈师", slogan: "中间数两次，合计减一次。", mission: "先把两样都会的数量放进中间，再补两边。", watch: "总数不是两边直接相加，中间有没有重复最关键。", tryThis: "用家里人的兴趣编一个两圈重叠小调查。" },
+    { role: "方格拼图师", slogan: "面积看小格，周长数外边。", mission: "在方格纸上拼图形，描出真正的外边。", watch: "贴在里面的边不是外边，不能算进周长。", tryThis: "用 4 个小正方形拼两种图形，比较周长是否一样。" },
+    { role: "视角摄影师", slogan: "眼睛站哪边，就画哪边样子。", mission: "先画观察箭头，再画从前面、侧面或上面看到的图。", watch: "从上面看位置，从前面看高度，不要混在一起。", tryThis: "搭 4 块积木，给家人猜这是从哪一面看到的。" },
+    { role: "整体检查员", slogan: "先问整体是谁，再看平均分。", mission: "给整体画外框，检查每份是不是一样大。", watch: "不是同一个整体，或者没有平均分，就不能直接写分数。", tryThis: "找两个看起来都是一半但整体不同的例子。" },
+    { role: "分数切分师", slogan: "整体一样，分得越多每份越小。", mission: "画同样长的分数条，比较几分之一的大小。", watch: "比较前先确认整体一样大。", tryThis: "画 1/2、1/4、1/8，让家人指出哪一份最大。" },
+    { role: "涂色记录员", slogan: "下面分几份，上面取几份。", mission: "先平均分格，再按分子涂色。", watch: "分母看总份数，分子看涂色份数，别写反。", tryThis: "自己画一个 3/4，再换成 2/4 比较涂色变化。" },
+    { role: "生活分数发现家", slogan: "生活里的半个，也要说整体。", mission: "在钟面、杯子、纸条里找分数，并说清整体。", watch: "半小时、半杯、半张纸的整体不一样。", tryThis: "在家找 3 个分数例子，每个都补一句‘整体是……’。" },
+    { role: "表格定位员", slogan: "标题定主题，行列找位置，单位别漏掉。", mission: "先读标题和单位，再找到行列交叉格。", watch: "不要只拿数字，要说出数字来自哪一行哪一列。", tryThis: "把一张家庭零花钱表读给别人听，并问一个问题。" },
+    { role: "条形图测量师", slogan: "不只看长短，还要读刻度。", mission: "用条形长度比较多少，再用刻度求差。", watch: "多出来的一段要标括号，差值从刻度里来。", tryThis: "把 3 个项目画成条形图，问‘谁比谁多多少’。" },
+    { role: "线段画图师", slogan: "谁多画长，问题标上。", mission: "用线段表示总数、部分、差和多几少几。", watch: "线段长短要跟题目关系一致，问题要标在图上。", tryThis: "把一道比多比少题只画图不计算，让家人看图列式。" },
+    { role: "规律侦察员", slogan: "先圈一组，再找位置。", mission: "找数字、图形或位置的变化规则。", watch: "答案要能说出规则，不能只靠猜。", tryThis: "设计一串有规律的珠子，让家人猜第 12 个是什么。" },
+    { role: "闯关分类员", slogan: "先看关卡类型，再动笔。", mission: "把题目分成准确关、顺序关或巧算关。", watch: "综合题更要慢一点选方法，别一上来硬算。", tryThis: "给 3 道题贴方法标签：验算、顺序、巧算。" },
+    { role: "图形工具师", slogan: "先选图，再判断。", mission: "在圈图、格子图、视角图里选合适工具。", watch: "图和算式必须处理同一个关系，不能图画一套、算式写一套。", tryThis: "同一道空间题先选工具卡，再说为什么不用另一张。" },
+    { role: "信息翻译官", slogan: "文字变成图，图再回到算式。", mission: "把分数、表格和图形信息放到同一个整体里。", watch: "总量要一致，分数和表格不能各说各的。", tryThis: "把一张小表格改成整体条，再涂出其中一部分。" },
+    { role: "数学游戏设计师", slogan: "能教别人，才是真的会。", mission: "设计一个有规则、题目、答案和解释的数学小游戏。", watch: "游戏好玩还不够，别人要能听懂为什么答案对。", tryThis: "邀请家人试玩，记录一个听不懂的地方并修改规则。" },
+    { role: "条件路线员", slogan: "原来先画好，变化接箭头。", mission: "按事情发生顺序，把增加、减少、分组画成箭头。", watch: "每一步箭头都要对应一道算式，不能跳步。", tryThis: "把一道两步应用题画成‘原来→变化→结果’路线图。" },
+    { role: "分组圈画师", slogan: "乘法看几个几，除法看怎么分。", mission: "用同一张点阵解释乘法、包含分和平均分。", watch: "每组必须一样多，圈组方式决定除法含义。", tryThis: "用 32 个点画两种分组方法，说出两道除法。" },
+    { role: "倍数线段师", slogan: "多几看差，几倍看几段。", mission: "先画一份，再复制成几份或标出相差的一段。", watch: "倍数图里的每一段要一样长。", tryThis: "把‘24 是 6 的几倍’和‘24 比 6 多几’画成两张不同线段图。" },
+    { role: "一题多图挑战者", slogan: "换一种图，也要同一个答案。", mission: "给一道题尝试两种图，检查答案是否一致。", watch: "开放题也要有顺序，枚举不能漏、不能重复。", tryThis: "挑一题分别用表格图和线段图解释。" },
+  ];
+
   const abilityMission = {
     calc: "把计算过程画出来，养成检查和说理的习惯。",
     quick: "用图发现省力路线，而不是硬算到底。",
@@ -196,6 +228,20 @@ const MathCourseUpgrade = (() => {
     return `能用${diagram.tool}解释${lesson.title}，并把图、算式、理由连起来。`;
   }
 
+  function childGuideFor(lesson) {
+    const guide = childLessonGuides[lesson.number - 1];
+    if (guide) return guide;
+
+    const diagram = diagramFor(lesson);
+    return {
+      role: "数学小老师",
+      slogan: diagram.habit,
+      mission: `用${diagram.tool}讲清${lesson.title}。`,
+      watch: diagram.checkpoint,
+      tryThis: "换一个数字或物品，重新讲一遍。",
+    };
+  }
+
   function buildMeta(lesson) {
     return {
       title: lesson.title,
@@ -210,15 +256,16 @@ const MathCourseUpgrade = (() => {
 
   function buildSteps(lesson) {
     const diagram = diagramFor(lesson);
+    const childGuide = childGuideFor(lesson);
     const example = lesson.workedExample?.problem || lesson.exercises[0][1];
     const steps = {
       read: {
         title: "读题侦察",
-        intro: "先看情境，不急着算。把已知、关系词和问题找出来。",
+        intro: `${childGuide.role}先看情境，不急着算。把已知、关系词和问题找出来。`,
         task: lesson.scene
           ? `完成“${lesson.scene.title}”：${lesson.scene.steps[0]}`
           : `读一遍情境：${lesson.lifeIntro}`,
-        prompt: "我知道了什么？最后要问什么？",
+        prompt: childGuide.mission,
       },
       choose: {
         title: "选图工具",
@@ -230,19 +277,19 @@ const MathCourseUpgrade = (() => {
         title: "跟画例题",
         intro: `照着例题画一遍，边画边把每个数量标到图上。`,
         task: example,
-        prompt: lesson.workedExample?.childSay || lesson.method,
+        prompt: lesson.workedExample?.childSay || childGuide.slogan,
       },
       practice: {
         title: "独立闯关",
         intro: "先自己画图，再列式。不会时只看提示，不直接看答案。",
         task: lesson.exercises[1]?.[1] || lesson.exercises[0][1],
-        prompt: "我的图能不能解释我的算式？",
+        prompt: childGuide.watch,
       },
       reflect: {
         title: "复盘讲题",
         intro: "像小老师一样讲一遍：为什么这样画，为什么这样算。",
         task: lesson.reviewPrompt,
-        prompt: `今天要避开的错因：${lesson.mistakeTips[0]}`,
+        prompt: `${childGuide.slogan} ${childGuide.tryThis}`,
       },
     };
 
@@ -269,6 +316,7 @@ const MathCourseUpgrade = (() => {
   }
 
   function buildPracticeSets(lesson) {
+    const childGuide = childGuideFor(lesson);
     const base = lesson.exercises.map(([level, question, answer, explanation]) => ({
       level,
       question,
@@ -276,7 +324,7 @@ const MathCourseUpgrade = (() => {
       explanation,
       diagramType: diagramFor(lesson).tool,
       drawHint: diagramFor(lesson).drawPrompt,
-      reasoningPrompt: "先说图，再说算式，最后说答案。",
+      reasoningPrompt: childGuide.slogan,
     }));
     const core = lesson.exercises[1] || lesson.exercises[0];
     const transfer = {
@@ -286,22 +334,25 @@ const MathCourseUpgrade = (() => {
       explanation: "迁移题重点看能不能把今天的图示方法用到新题里。",
       diagramType: diagramFor(lesson).tool,
       drawHint: "沿用今天的主图示，换数字后重新标出条件和问题。",
-      reasoningPrompt: "我为什么仍然选择这张图？",
+      reasoningPrompt: `我为什么仍然选择这张图？${childGuide.watch}`,
     };
     return [...base, transfer];
   }
 
   function buildSelfCheck(lesson) {
     const diagram = diagramFor(lesson);
+    const childGuide = childGuideFor(lesson);
     return {
       criteria: [
         `我能独立选择${diagram.tool}。`,
         "我能先画图，再列式，不跳过关系说明。",
         "我能把答案从图上解释出来。",
-        `我能避开：${lesson.mistakeTips[0]}。`,
+        `我能避开：${childGuide.watch}`,
+        `我能当${childGuide.role}讲出：${childGuide.slogan}`,
       ],
       reflection: lesson.reviewPrompt,
       mistakeTips: lesson.mistakeTips,
+      tryThis: childGuide.tryThis,
     };
   }
 
@@ -318,6 +369,7 @@ const MathCourseUpgrade = (() => {
       practiceSets: buildPracticeSets(lesson),
       selfCheck: buildSelfCheck(lesson),
       parentOptional: buildParentOptional(lesson),
+      childGuide: childGuideFor(lesson),
     };
 
     return { ...lesson, upgraded };

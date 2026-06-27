@@ -733,6 +733,35 @@ textarea {
   border-radius: var(--radius);
 }
 
+.child-role-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  color: var(--yellow);
+  background: rgba(255, 240, 200, 0.88);
+  border: 1px solid rgba(154, 107, 22, 0.25);
+  border-radius: var(--radius);
+}
+
+.child-role-card span,
+.kid-label {
+  color: var(--yellow);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.child-role-card strong {
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.child-role-card p,
+.kid-slogan {
+  margin: 0;
+  font-weight: 800;
+}
+
 .mission-board {
   display: grid;
   gap: 8px;
@@ -943,6 +972,14 @@ details.answer p {
   margin: 0;
 }
 
+.self-study-card > strong {
+  font-size: 18px;
+}
+
+.kid-slogan {
+  color: var(--yellow);
+}
+
 .tool-chip {
   justify-self: start;
   padding: 5px 9px;
@@ -1122,6 +1159,7 @@ details.answer p {
   background: #fbfcfd;
 }
 
+.try-this,
 .child-say {
   padding: 10px 12px;
   color: var(--green);
@@ -1129,6 +1167,13 @@ details.answer p {
   border: 1px solid #c1e4d0;
   border-radius: var(--radius);
   font-weight: 800;
+}
+
+.try-this {
+  margin: 12px 0 0;
+  color: var(--blue);
+  background: var(--blue-2);
+  border-color: #bddfee;
 }
 
 .flow-card,

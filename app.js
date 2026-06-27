@@ -1649,6 +1649,7 @@ function renderLesson() {
 function renderStepPanel(lesson, step, progress) {
   const stepIndex = lesson.upgraded.steps.indexOf(step);
   const done = progress.completedSteps.includes(stepIndex);
+  const childGuide = lesson.upgraded.childGuide;
   return `
     <section class="studio-panel">
       <div>
@@ -1656,6 +1657,13 @@ function renderStepPanel(lesson, step, progress) {
         <h2>${esc(step.title)}</h2>
         <p>${esc(step.intro)}</p>
       </div>
+      ${childGuide ? `
+        <article class="child-role-card">
+          <span>今天我是</span>
+          <strong>${esc(childGuide.role)}</strong>
+          <p>${esc(childGuide.slogan)}</p>
+        </article>
+      ` : ""}
       <article class="mission-board">
         <span>我要做</span>
         <strong>${esc(step.task)}</strong>
@@ -1713,22 +1721,31 @@ function renderParentOptional(lesson) {
 }
 
 function renderSelfStudyCard(lesson) {
+  const childGuide = lesson.upgraded.childGuide;
   return `
     <article class="self-study-card">
-      <strong>${esc(lesson.upgraded.meta.mission)}</strong>
-      <p>${esc(lesson.method)}</p>
+      ${childGuide ? `
+        <span class="kid-label">今天我是</span>
+        <strong>${esc(childGuide.role)}</strong>
+        <p class="kid-slogan">${esc(childGuide.slogan)}</p>
+        <p>${esc(childGuide.mission)}</p>
+      ` : `
+        <strong>${esc(lesson.upgraded.meta.mission)}</strong>
+        <p>${esc(lesson.method)}</p>
+      `}
       <div class="tool-chip">${esc(lesson.upgraded.visualTasks[0].name)}</div>
     </article>
   `;
 }
 
 function renderStuckHints(lesson) {
+  const childGuide = lesson.upgraded.childGuide;
   return `
     <ol class="hint-list">
       <li>先把题目里的数字、单位和关系词圈出来。</li>
       <li>再问自己：这题适合${esc(lesson.upgraded.visualTasks[0].name)}吗？为什么？</li>
       <li>如果不会列式，先把图补完整，再从图上找算式。</li>
-      <li>最后检查：${esc(lesson.upgraded.visualTasks[0].checkpoint)}</li>
+      <li>特别盯住：${esc(childGuide?.watch || lesson.upgraded.visualTasks[0].checkpoint)}</li>
     </ol>
   `;
 }
@@ -1740,6 +1757,9 @@ function renderSelfCheck(lesson) {
         ${lesson.upgraded.selfCheck.criteria.map((item) => `<li>${esc(item)}</li>`).join("")}
       </ul>
       <p class="child-say">${esc(lesson.upgraded.selfCheck.reflection)}</p>
+      ${lesson.upgraded.selfCheck.tryThis ? `
+        <p class="try-this"><strong>试试看：</strong>${esc(lesson.upgraded.selfCheck.tryThis)}</p>
+      ` : ""}
     </div>
   `;
 }
