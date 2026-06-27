@@ -45,7 +45,7 @@
         <span class="brand-mark"><svg><use href="#icon-grid"></use></svg></span>
         <span>
           <strong>二升三暑假数学</strong>
-          <small>家长陪学静态课程</small>
+          <small>自主画图闯关课</small>
         </span>
       </button>
       <nav class="main-nav" aria-label="主要导航">
@@ -64,6 +64,9 @@
         <button class="nav-button" type="button" data-view="overlap">
           <svg><use href="#icon-puzzle"></use></svg><span>空间</span>
         </button>
+        <button class="nav-button" type="button" data-view="drawing">
+          <svg><use href="#icon-note"></use></svg><span>画图</span>
+        </button>
         <button class="nav-button" type="button" data-view="mistakes">
           <svg><use href="#icon-note"></use></svg><span>错题</span>
         </button>
@@ -77,18 +80,18 @@
       <section id="view-overview" class="view is-active" aria-labelledby="overview-title">
         <div class="summary-band">
           <div>
-            <p class="eyebrow">6周 / 24节 / 家长陪学</p>
-            <h1 id="overview-title">把暑假数学拆成每天能完成的一小步</h1>
+            <p class="eyebrow">7周 / 28节 / 自主学习 + 可选陪学</p>
+            <h1 id="overview-title">先画图，再解题，把数学关系看出来</h1>
             <p class="lede">
-              面向二升三孩子，围绕计算、简便运算、逻辑空间、分数数感、信息整合五项能力设计。
-              每节课都有家长讲解词、互动问题、分层练习和答案提示。
+              面向二升三孩子，围绕计算、速算、逻辑空间、分数、图表和画图解题六条能力线。
+              每节课按学习地图推进，孩子可以自己读题、选图、画图、闯关和复盘。
             </p>
           </div>
           <div class="hero-board" aria-label="课程能力示意图">
             <div class="mini-grid" aria-hidden="true"></div>
             <div class="hero-stat"><strong id="completedCount">0</strong><span>已完成</span></div>
-            <div class="hero-stat"><strong>5</strong><span>能力线</span></div>
-            <div class="hero-stat"><strong>24</strong><span>节课</span></div>
+            <div class="hero-stat"><strong>6</strong><span>能力线</span></div>
+            <div class="hero-stat"><strong>28</strong><span>节课</span></div>
           </div>
         </div>
 
@@ -97,7 +100,7 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">课程路线</p>
-            <h2>六周总览</h2>
+            <h2>七周能力地图</h2>
           </div>
           <button id="continueButton" class="primary-button" type="button">
             <svg><use href="#icon-book"></use></svg>
@@ -177,6 +180,40 @@
         <div id="overlapBoard" class="overlap-wrap"></div>
       </section>
 
+      <section id="view-drawing" class="view" aria-labelledby="drawing-title">
+        <div class="tool-layout">
+          <div class="tool-copy">
+            <p class="eyebrow">专项工具</p>
+            <h1 id="drawing-title">画图解题训练场</h1>
+            <p>
+              每题先选择适合的图，再列式计算。重点不是算得快，而是能说清“为什么这样画”。
+            </p>
+          </div>
+          <div class="tool-controls drawing-controls" aria-label="画图题设置">
+            <label for="drawingMode">题型</label>
+            <select id="drawingMode">
+              <option value="mixed">混合训练</option>
+              <option value="drawStory">画图整理条件</option>
+              <option value="arrayGroup">阵列/分组图</option>
+              <option value="barModel">线段/倍数图</option>
+              <option value="drawingChallenge">画图思维挑战</option>
+            </select>
+            <label for="drawingLevel">难度</label>
+            <select id="drawingLevel">
+              <option value="base">基础</option>
+              <option value="core" selected>核心</option>
+              <option value="challenge">挑战</option>
+            </select>
+            <button id="generateDrawing" class="primary-button" type="button">
+              <svg><use href="#icon-bolt"></use></svg>
+              生成练习
+            </button>
+            <button id="checkDrawing" class="ghost-button" type="button">检查答案</button>
+          </div>
+        </div>
+        <div id="drawingBoard" class="drawing-board"></div>
+      </section>
+
       <section id="view-mistakes" class="view" aria-labelledby="mistakes-title">
         <div class="tool-layout">
           <div class="tool-copy">
@@ -237,6 +274,7 @@
       </section>
     </main>
 
+    <script src="course-upgrade.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

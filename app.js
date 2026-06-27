@@ -1,4 +1,4 @@
-const storageKey = "summerMathLessonState:v1";
+const storageKey = "summerMathLessonState:v2";
 
 const abilities = [
   {
@@ -25,6 +25,11 @@ const abilities = [
     id: "info",
     title: "数形结合",
     summary: "表格、条形图、线段图和规律表达",
+  },
+  {
+    id: "drawing",
+    title: "画图解题",
+    summary: "条件图、阵列图、线段图、圈图和枚举图",
   },
 ];
 
@@ -58,6 +63,11 @@ const weeks = [
     number: 6,
     title: "综合应用与项目表达",
     goal: "独立分析、画图、计算和表达。",
+  },
+  {
+    number: 7,
+    title: "画图解决问题专项",
+    goal: "先选图、再画图、再列式，用图解释数量关系。",
   },
 ];
 
@@ -518,6 +528,79 @@ const lessonSeeds = [
     mistakeTips: ["只有答案没有规则", "不会解释为什么答案正确"],
     reviewPrompt: "我能像小老师一样讲清一个数学游戏吗？",
   },
+  {
+    title: "画图整理条件",
+    ability: "drawing",
+    goal: "会用圈画、箭头图和分组图整理两步应用题条件。",
+    lifeIntro: "把买铅笔、送铅笔的故事画成先求总数、再看变化的图。",
+    visualType: "drawStory",
+    method: "先画条件，再看关系；几个几用乘法，少了剩下用减法。",
+    parentScript: "先让孩子圈数字和单位，再把事情发生顺序画成箭头；遇到每盒几个、几盒时先画分组。",
+    questions: ["每盒6支、4盒表示几个几？", "先算总支数，还是先减送出的？", "图里哪一部分表示送出去的？"],
+    warmups: ["圈数字和单位", "画原来→送出", "画4组6", "说先算什么"],
+    exercises: [
+      ["基础", "小红有24张贴纸，送给妹妹8张，又买来6张，现在有多少张？", "22张", "画箭头图：24→减8→加6，24-8+6=22。"],
+      ["核心", "有5袋糖，每袋8颗，吃掉9颗，还剩多少颗？", "31颗", "先画5组8，求出40颗，再40-9=31。"],
+      ["挑战", "一盒彩笔6支，买4盒，又单独买3支。平均分给3个同学，每人几支？", "9支", "6×4+3=27，27÷3=9。"],
+    ],
+    mistakeTips: ["只看到吃掉就先减，忘记先求总数", "分组图每组数量画得不一样", "两步题只回答了第一步"],
+    reviewPrompt: "我能说出今天这题为什么先画条件吗？",
+  },
+  {
+    title: "阵列图和分组图",
+    ability: "drawing",
+    goal: "用点阵和分组图理解乘法、平均分和包含分。",
+    lifeIntro: "24颗糖可以每6颗装一袋，也可以平均分给4人，同一张图能正看反看。",
+    visualType: "arrayGroup",
+    method: "乘法画几个几，除法看分几组；同一张图，能正看也能反看。",
+    parentScript: "让孩子画点阵，再分别圈行、圈列、圈每份，体会乘除互逆。",
+    questions: ["4×6图里4和6分别表示什么？", "24÷6是在问每份几个，还是有几份？", "同一张点阵能写出几道算式？"],
+    warmups: ["画3组5", "圈每6个一组", "平均分给4人", "写一乘两除"],
+    exercises: [
+      ["基础", "每盘5个苹果，摆4盘，一共有多少个？", "20个", "画4组，每组5个，5×4=20。"],
+      ["核心", "32颗糖，每8颗装一袋，可以装几袋？", "4袋", "每8颗圈一组，32÷8=4。"],
+      ["挑战", "36个小方块可以摆成长方形点阵，至少写出两种排法。", "如4×9、6×6", "同一个总数可以有不同的行列排法。"],
+    ],
+    mistakeTips: ["把平均分和每几个一组混淆", "乘法图没有画成相同大小的组", "只会背口诀不会解释图"],
+    reviewPrompt: "我能用一张点阵说出乘法和除法吗？",
+  },
+  {
+    title: "线段图和倍数图",
+    ability: "drawing",
+    goal: "用线段表示多几少几和几倍关系，区分差与倍。",
+    lifeIntro: "小明6颗糖，小红比他多3颗和小红是他的3倍，画出来完全不同。",
+    visualType: "barModel",
+    method: "多几少几看差，几倍就是几个同样长。",
+    parentScript: "先画基准量，再决定是接一小段差，还是复制几段同样长。",
+    questions: ["多6和3倍一样吗？", "几倍图要画几段同样长？", "已知3段一共18，每段是多少？"],
+    warmups: ["画多5", "画少4", "画3倍", "看图写算式"],
+    exercises: [
+      ["基础", "小明有20张卡片，小红比小明少5张。小红有多少张？", "15张", "少5就是从20里去掉5。"],
+      ["核心", "小明有8颗糖，小红是小明的3倍。小红有多少颗？", "24颗", "画3段8，8×3=24。"],
+      ["挑战", "小红有24颗糖，是小明的4倍。小明有多少颗？两人一共有多少颗？", "小明6颗，一共30颗", "24÷4=6，再24+6=30。"],
+    ],
+    mistakeTips: ["把多几当成几倍", "倍数图没有画同样长", "问一共时漏加基准量"],
+    reviewPrompt: "我能画图说明多3和3倍有什么不同吗？",
+  },
+  {
+    title: "画图思维挑战",
+    ability: "drawing",
+    goal: "选择合适图示解决综合题，尝试一题多图、枚举和逆向思考。",
+    lifeIntro: "像工具箱一样选择分组图、线段图、圈图、表格图或逆向图。",
+    visualType: "drawingChallenge",
+    method: "先选图，再解题；换一种图，就多一种想法。",
+    parentScript: "不要只追答案，要求孩子先说为什么选这张图，再尝试有没有第二种画法。",
+    questions: ["这题适合哪种图？", "有没有重复或遗漏？", "能不能倒着画？", "能不能自己编一题？"],
+    warmups: ["选工具图", "画表格枚举", "倒着走", "一题两图"],
+    exercises: [
+      ["基础", "有4盒糖，每盒6颗，吃掉8颗，还剩多少颗？请说一种画图方法。", "16颗", "可画分组图求24，再画线段图减8。"],
+      ["核心", "用1元、2元、5元纸币凑成6元，至少写出3种方法。", "如6个1元；2张2元+2个1元；1张5元+1个1元", "用表格按5元张数、2元张数、1元张数有序列。"],
+      ["挑战", "一个数先加8，再乘3，结果是36。这个数是多少？", "4", "倒着画：36÷3=12，12-8=4。"],
+    ],
+    mistakeTips: ["随便选图但说不出理由", "枚举没有顺序导致漏答案", "逆向题没有倒着做相反运算"],
+    reviewPrompt: "我今天能不能用两种图解释同一题？",
+  },
+
 ];
 
 const lessonEnrichments = [
@@ -1242,15 +1325,42 @@ const lessonEnrichments = [
       { title: "试玩反馈", detail: "家长试玩后，把听不懂的地方写在修改栏。" },
     ],
   },
+  {
+    scene: { title: "铅笔盒采购", materials: "画4个盒子，每盒6支铅笔，再画送出5支。", steps: ["先把4盒画成4个同样的框。", "每框写6，合起来求总数。", "再用箭头表示送出或买来。"] },
+    parentGuide: ["文字题先收拾条件，不急着列式。", "看到每盒几个、几盒，就是几个相同的组。", "箭头表示事情发生顺序，能防止两步题漏算。"],
+    workedExample: { problem: "有5袋糖，每袋8颗，吃掉9颗，还剩多少颗？", steps: ["画5个袋子，每袋写8。", "先算5×8=40颗。", "吃掉9颗，40-9=31颗。"], childSay: "我先用分组图求总数，再用箭头图看变化。" },
+    diagramSteps: [{ title: "圈条件", detail: "圈出数量、单位和动作词。" }, { title: "画分组", detail: "几个几先画成相同的组。" }, { title: "接箭头", detail: "增加、减少按顺序接在总数后面。" }],
+  },
+  {
+    scene: { title: "糖果装袋和平均分", materials: "准备24个圆点。", steps: ["先排成4行6列。", "每6个圈一组，看能装几袋。", "平均分成4份，看每份几个。"] },
+    parentGuide: ["乘法图必须每组一样多。", "除法有两种问法：问几组，或问每组几个。", "同一张点阵可以横看、竖看、分组看。"],
+    workedExample: { problem: "32颗糖，每8颗装一袋，可以装几袋？", steps: ["画32个点。", "每8个圈一组。", "数出4组，所以32÷8=4。"], childSay: "我看32里面有几个8。" },
+    diagramSteps: [{ title: "点阵", detail: "把总数排成整齐行列。" }, { title: "圈组", detail: "按每份数量圈起来。" }, { title: "互逆", detail: "从图上写出乘法和除法。" }],
+  },
+  {
+    scene: { title: "贴纸比较", materials: "画一条短线段表示小明，再画小红。", steps: ["先画基准量。", "多几就接一小段，几倍就复制几段。", "把问题括在要求的线段上。"] },
+    parentGuide: ["多几看差，几倍看相同段数。", "线段长短要和题目关系一致。", "已知总长和段数时，用除法求一段。"],
+    workedExample: { problem: "小红有24颗糖，是小明的4倍。小明有多少颗？", steps: ["画小红4段同样长，一共24。", "每段表示小明的数量。", "24÷4=6。"], childSay: "4倍就是4段一样长。" },
+    diagramSteps: [{ title: "基准段", detail: "先画已知或被比较的数量。" }, { title: "差或倍", detail: "多几接差，几倍复制同样段。" }, { title: "问题括号", detail: "要求哪一段，就括住哪一段。" }],
+  },
+  {
+    scene: { title: "画图工具箱", materials: "五张工具卡：分组图、线段图、圈图、表格图、逆向图。", steps: ["读题先选工具。", "说明为什么选它。", "尝试一题多图或有序枚举。"] },
+    parentGuide: ["综合题重点是选图理由。", "枚举要有顺序，避免漏和重复。", "逆向题从结果倒着走，每一步做相反运算。"],
+    workedExample: { problem: "一个数先加8，再乘3，结果是36。这个数是多少？", steps: ["从结果36倒着看。", "乘3的反向是除以3，36÷3=12。", "加8的反向是减8，12-8=4。"], childSay: "我可以倒着画，把运算反过来。" },
+    diagramSteps: [{ title: "工具选择", detail: "先判断题型，再选图。" }, { title: "有序列举", detail: "表格从一种条件开始按顺序变化。" }, { title: "开放表达", detail: "自己编题时必须有图、算式和解释。" }],
+  },
+
 ];
 
-const lessons = lessonSeeds.map((lesson, index) => ({
+const baseLessons = lessonSeeds.map((lesson, index) => ({
   ...lesson,
   ...lessonEnrichments[index],
   id: index + 1,
   number: index + 1,
   week: Math.floor(index / 4) + 1,
 }));
+
+const lessons = window.MathCourseUpgrade ? window.MathCourseUpgrade.enrichLessons(baseLessons) : baseLessons;
 
 const fractionOptions = [
   { numerator: 1, denominator: 2 },
@@ -1278,7 +1388,10 @@ function loadState() {
     mentalQuestions: [],
     mentalChecked: false,
     lessonHomework: {},
+    lessonProgress: {},
     overlapRevealed: false,
+    drawingQuestions: [],
+    drawingChecked: false,
   };
 
   try {
@@ -1286,6 +1399,8 @@ function loadState() {
     const merged = { ...fallback, ...saved };
     merged.lessonHomework =
       merged.lessonHomework && typeof merged.lessonHomework === "object" ? merged.lessonHomework : {};
+    merged.lessonProgress =
+      merged.lessonProgress && typeof merged.lessonProgress === "object" ? merged.lessonProgress : {};
     return merged;
   } catch (error) {
     return fallback;
@@ -1337,6 +1452,41 @@ function setDone(id, done) {
   saveState();
 }
 
+function lessonProgressFor(id) {
+  const key = String(id);
+  const fallback = { currentStep: 0, completedSteps: [] };
+  const progress = state.lessonProgress?.[key];
+  if (!progress || typeof progress !== "object") return fallback;
+  return {
+    currentStep: Number(progress.currentStep) || 0,
+    completedSteps: Array.isArray(progress.completedSteps) ? progress.completedSteps : [],
+  };
+}
+
+function setLessonStep(id, stepIndex) {
+  const lesson = lessonById(id);
+  const index = Math.min(Math.max(Number(stepIndex), 0), lesson.upgraded.steps.length - 1);
+  if (!state.lessonProgress || typeof state.lessonProgress !== "object") {
+    state.lessonProgress = {};
+  }
+  const progress = lessonProgressFor(id);
+  state.lessonProgress[String(id)] = { ...progress, currentStep: index };
+  saveState();
+}
+
+function toggleLessonStep(id, stepIndex) {
+  const index = Number(stepIndex);
+  if (!state.lessonProgress || typeof state.lessonProgress !== "object") {
+    state.lessonProgress = {};
+  }
+  const progress = lessonProgressFor(id);
+  const completed = progress.completedSteps.includes(index)
+    ? progress.completedSteps.filter((item) => item !== index)
+    : [...progress.completedSteps, index].sort((a, b) => a - b);
+  state.lessonProgress[String(id)] = { ...progress, currentStep: index, completedSteps: completed };
+  saveState();
+}
+
 function renderAll() {
   populateSelectors();
   renderOverview();
@@ -1345,6 +1495,7 @@ function renderAll() {
   renderFractionControls();
   renderFractionLab();
   renderOverlapPractice();
+  renderDrawingPractice();
   renderMistakes();
   renderPrintSheet();
 }
@@ -1381,6 +1532,7 @@ function renderOverview() {
         <article class="ability-pill">
           <strong>${esc(ability.title)} · ${done}/${count}</strong>
           <span>${esc(ability.summary)}</span>
+          <small>${esc((lessons.find((lesson) => lesson.ability === ability.id)?.upgraded.meta.mission) || "先画图，再说理。")}</small>
         </article>
       `;
     })
@@ -1403,14 +1555,18 @@ function renderOverview() {
             ${weekLessons
               .map((lesson) => {
                 const ability = abilityById(lesson.ability);
+                const progress = lessonProgressFor(lesson.id);
+                const stepDone = progress.completedSteps.length;
                 return `
                   <button class="lesson-card ${isDone(lesson.id) ? "is-done" : ""}" type="button" data-lesson-id="${lesson.id}">
                     <span class="lesson-number">${lesson.number}</span>
                     <span>
                       <strong>${esc(lesson.title)}</strong>
-                      <span>${esc(lesson.goal)}</span>
+                      <span>${esc(lesson.upgraded.meta.output)}</span>
                       <span class="tag-row">
                         <span class="tag">${esc(ability.title)}</span>
+                        <span class="tag">${stepDone}/${lesson.upgraded.steps.length}步</span>
+                        <span class="tag">${esc(lesson.upgraded.visualTasks[0].name)}</span>
                         ${isDone(lesson.id) ? '<span class="tag">已完成</span>' : ""}
                       </span>
                     </span>
@@ -1428,15 +1584,18 @@ function renderOverview() {
 function renderLesson() {
   const lesson = lessonById(state.currentLessonId);
   const ability = abilityById(lesson.ability);
+  const progress = lessonProgressFor(lesson.id);
+  const currentStep = lesson.upgraded.steps[progress.currentStep] || lesson.upgraded.steps[0];
+  const doneCount = progress.completedSteps.length;
   $("#lessonSelect").value = String(lesson.id);
 
   $("#lessonDetail").innerHTML = `
-    <article class="lesson-shell">
+    <article class="lesson-shell lesson-studio">
       <header class="lesson-header">
         <div>
-          <p class="eyebrow">第${lesson.week}周 · 第${lesson.number}课 · ${esc(ability.title)}</p>
+          <p class="eyebrow">第${lesson.week}周 · 第${lesson.number}课 · ${esc(ability.title)} · 自主学习闯关</p>
           <h1 id="lesson-title">${esc(lesson.title)}</h1>
-          <p class="lede">${esc(lesson.goal)}</p>
+          <p class="lede">${esc(lesson.upgraded.meta.output)}</p>
         </div>
         <div class="lesson-actions">
           <button class="ghost-button" type="button" data-lesson-nav="prev">上一课</button>
@@ -1447,27 +1606,66 @@ function renderLesson() {
           </label>
         </div>
       </header>
-      <div class="lesson-body">
-        <div class="lesson-column">
-          ${renderLessonSection("生活导入", renderScenario(lesson))}
-          ${renderLessonSection("30-40分钟陪学流程", renderLessonFlow(lesson))}
-          ${renderLessonSection("家长讲解词", renderParentGuide(lesson))}
-          ${renderLessonSection("图示讲解", `${renderVisual(lesson)}${renderDiagramSteps(lesson)}`)}
-          ${renderLessonSection("方法口诀", `<p class="method-card">${esc(lesson.method)}</p>`)}
+      <div class="studio-progress">
+        <div>
+          <strong>学习地图</strong>
+          <span>${doneCount}/${lesson.upgraded.steps.length} 步完成</span>
         </div>
-        <div class="lesson-column">
-          ${renderLessonSection("完整实例拆解", renderWorkedExample(lesson))}
-          ${renderLessonSection("掌握标准", renderMasteryCriteria(lesson))}
-          ${renderLessonSection("互动提问", renderList(lesson.questions, "plain-list"))}
-          ${renderLessonSection("口算热身", renderWarmups(lesson.warmups))}
-          ${renderLessonSection("分层练习", renderExercises(lesson.exercises))}
-          ${renderLessonSection("课后作业", renderHomework(lesson))}
-          ${renderLessonSection("课后延伸", renderHomeExtension(lesson))}
-          ${renderLessonSection("错因提醒", renderList(lesson.mistakeTips, "plain-list"))}
-          ${renderLessonSection("复盘表达", `<p>${esc(lesson.reviewPrompt)}</p>`)}
-        </div>
+        <progress value="${doneCount}" max="${lesson.upgraded.steps.length}"></progress>
+      </div>
+      <div class="studio-map" aria-label="课内步骤">
+        ${lesson.upgraded.steps
+          .map((step, index) => `
+            <button
+              class="studio-step ${index === progress.currentStep ? "is-active" : ""} ${progress.completedSteps.includes(index) ? "is-done" : ""}"
+              type="button"
+              data-lesson-step="${index}"
+            >
+              <span>${index + 1}</span>
+              ${esc(step.title)}
+            </button>
+          `)
+          .join("")}
+      </div>
+      <div class="studio-grid">
+        <section class="studio-main">
+          ${renderStepPanel(lesson, currentStep, progress)}
+          ${renderLessonSection("图形实验", `${renderVisual(lesson)}${renderVisualTasks(lesson)}`)}
+          ${renderLessonSection("跟画例题", renderWorkedExample(lesson))}
+          ${renderLessonSection("独立闯关", renderPracticeSets(lesson.upgraded.practiceSets))}
+          ${renderLessonSection("随机作业", renderHomework(lesson))}
+        </section>
+        <aside class="studio-side">
+          ${renderLessonSection("自学提示", renderSelfStudyCard(lesson))}
+          ${renderLessonSection("卡住时看", renderStuckHints(lesson))}
+          ${renderLessonSection("可选陪学追问", renderParentOptional(lesson))}
+          ${renderLessonSection("自查复盘", renderSelfCheck(lesson))}
+        </aside>
       </div>
     </article>
+  `;
+}
+
+function renderStepPanel(lesson, step, progress) {
+  const stepIndex = lesson.upgraded.steps.indexOf(step);
+  const done = progress.completedSteps.includes(stepIndex);
+  return `
+    <section class="studio-panel">
+      <div>
+        <p class="eyebrow">当前任务 · 第${stepIndex + 1}步</p>
+        <h2>${esc(step.title)}</h2>
+        <p>${esc(step.intro)}</p>
+      </div>
+      <article class="mission-board">
+        <span>我要做</span>
+        <strong>${esc(step.task)}</strong>
+        <p>${esc(step.prompt)}</p>
+      </article>
+      <button class="primary-button" type="button" data-toggle-step="${stepIndex}">
+        <svg><use href="#icon-check"></use></svg>
+        ${done ? "取消完成" : "完成这一步"}
+      </button>
+    </section>
   `;
 }
 
@@ -1502,6 +1700,64 @@ function renderParentGuide(lesson) {
   return `
     <div class="guide-card">
       ${guide.map((line, index) => `<p><span>${index + 1}</span>${esc(line)}</p>`).join("")}
+    </div>
+  `;
+}
+
+function renderParentOptional(lesson) {
+  return `
+    <div class="guide-card optional-guide">
+      ${lesson.upgraded.parentOptional.map((line, index) => `<p><span>${index + 1}</span>${esc(line)}</p>`).join("")}
+    </div>
+  `;
+}
+
+function renderSelfStudyCard(lesson) {
+  return `
+    <article class="self-study-card">
+      <strong>${esc(lesson.upgraded.meta.mission)}</strong>
+      <p>${esc(lesson.method)}</p>
+      <div class="tool-chip">${esc(lesson.upgraded.visualTasks[0].name)}</div>
+    </article>
+  `;
+}
+
+function renderStuckHints(lesson) {
+  return `
+    <ol class="hint-list">
+      <li>先把题目里的数字、单位和关系词圈出来。</li>
+      <li>再问自己：这题适合${esc(lesson.upgraded.visualTasks[0].name)}吗？为什么？</li>
+      <li>如果不会列式，先把图补完整，再从图上找算式。</li>
+      <li>最后检查：${esc(lesson.upgraded.visualTasks[0].checkpoint)}</li>
+    </ol>
+  `;
+}
+
+function renderSelfCheck(lesson) {
+  return `
+    <div class="self-check-card">
+      <ul class="mastery-list">
+        ${lesson.upgraded.selfCheck.criteria.map((item) => `<li>${esc(item)}</li>`).join("")}
+      </ul>
+      <p class="child-say">${esc(lesson.upgraded.selfCheck.reflection)}</p>
+    </div>
+  `;
+}
+
+function renderVisualTasks(lesson) {
+  return `
+    <div class="visual-task-grid">
+      ${lesson.upgraded.visualTasks
+        .map(
+          (task) => `
+            <article>
+              <span class="tag">${esc(task.name)}</span>
+              <p><strong>画图任务：</strong>${esc(task.prompt)}</p>
+              <p><strong>检查：</strong>${esc(task.checkpoint)}</p>
+            </article>
+          `,
+        )
+        .join("")}
     </div>
   `;
 }
@@ -1606,6 +1862,38 @@ function renderExercises(exercises) {
   `;
 }
 
+function renderPracticeSets(items) {
+  return `
+    <div class="exercise-list practice-set-list">
+      ${items
+        .map((item) => {
+          const levelClass = exerciseLevelClass(item.level);
+          return `
+            <article class="exercise practice-card">
+              <div class="practice-head">
+                <span class="exercise-level ${levelClass}">${esc(item.level)}</span>
+                <span class="tag">${esc(item.diagramType)}</span>
+              </div>
+              <p>${esc(item.question)}</p>
+              <div class="draw-hint">
+                <strong>先画图：</strong>${esc(item.drawHint)}
+              </div>
+              <div class="reasoning-prompt">
+                ${esc(item.reasoningPrompt)}
+              </div>
+              <details class="answer">
+                <summary>查看答案解析</summary>
+                <p><strong>答案：</strong>${esc(item.answer)}</p>
+                <p>${esc(item.explanation)}</p>
+              </details>
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function getLessonHomework(lessonId) {
   const homework = state.lessonHomework?.[String(lessonId)];
   return Array.isArray(homework) ? homework : [];
@@ -1639,8 +1927,19 @@ function renderHomework(lesson) {
                         <span>第${index + 1}题</span>
                       </div>
                       <p>${esc(item.question)}</p>
+                      ${
+                        item.drawHint
+                          ? `<div class="draw-hint"><strong>先画图：</strong>${esc(item.drawHint)}</div>`
+                          : ""
+                      }
+                      ${
+                        item.reasoningPrompt
+                          ? `<div class="reasoning-prompt">${esc(item.reasoningPrompt)}</div>`
+                          : ""
+                      }
                       <details class="answer">
                         <summary>查看答案解析</summary>
+                        ${item.diagramType ? `<p><strong>推荐图：</strong>${esc(item.diagramType)}</p>` : ""}
                         <p><strong>答案：</strong>${esc(item.answer)}</p>
                         <p>${esc(item.explanation)}</p>
                       </details>
@@ -1658,6 +1957,38 @@ function renderHomework(lesson) {
 function renderVisual(lesson) {
   const title = `<strong>${esc(lesson.title)}图示</strong>`;
   const type = lesson.visualType;
+
+
+  if (type === "drawStory") {
+    return renderIconBoard(title, ["4盒", "每盒6支", "先求24支", "送出5支", "剩下？"]);
+  }
+
+  if (type === "arrayGroup") {
+    return `
+      <div class="visual-card">
+        ${title}
+        <div class="dot-array">${Array.from({ length: 24 }, () => "<span></span>").join("")}</div>
+        <p>4行6列：4×6=24；也可以每6个圈一组，24÷6=4。</p>
+      </div>
+    `;
+  }
+
+  if (type === "barModel") {
+    return `
+      <div class="visual-card">
+        ${title}
+        <div class="bar-model-demo">
+          <span>小明 6</span>
+          <span>小红 6 + 6 + 6</span>
+        </div>
+        <p>多3是多出一小段；3倍是3段同样长。</p>
+      </div>
+    `;
+  }
+
+  if (type === "drawingChallenge") {
+    return renderIconBoard(title, ["分组图", "线段图", "圈图", "表格图", "逆向图"]);
+  }
 
   if (type === "place") {
     return `
@@ -1933,6 +2264,7 @@ function showView(viewName) {
     button.classList.toggle("is-active", button.dataset.view === viewName);
   });
   if (viewName === "lesson") renderLesson();
+  if (viewName === "drawing") renderDrawingPractice();
   if (viewName === "print") renderPrintSheet();
 }
 
@@ -2005,7 +2337,8 @@ function makeHomeworkQuestion(lesson, level) {
           ? homeworkMakers.fractionTable
           : homeworkMakers.challenge);
 
-  return { level, ...maker(level) };
+  const question = { level, ...maker(level) };
+  return window.MathCourseUpgrade ? window.MathCourseUpgrade.enrichQuestion(question, lesson) : question;
 }
 
 function setLessonHomework(lessonId, homework) {
@@ -2764,6 +3097,10 @@ const homeworkMakers = {
   bars: barsHomework,
   segment: segmentHomework,
   pattern: patternHomework,
+  drawStory: drawingStoryQuestion,
+  arrayGroup: drawingArrayQuestion,
+  barModel: drawingBarQuestion,
+  drawingChallenge: drawingChallengeQuestion,
   challenge: calculationChallengeHomework,
   logicMix: logicMixHomework,
   fractionTable: fractionTableHomework,
@@ -2930,6 +3267,223 @@ function checkOverlap() {
   renderOverlapPractice(feedback);
 }
 
+
+const diagramLabels = {
+  drawStory: "画图整理条件",
+  arrayGroup: "阵列/分组图",
+  barModel: "线段/倍数图",
+  drawingChallenge: "画图思维挑战",
+};
+
+function drawingStoryQuestion(level) {
+  const hard = level === "challenge" || level === "挑战";
+  if (Math.random() > 0.45) {
+    const groups = randomInt(3, hard ? 9 : 6);
+    const each = randomInt(4, hard ? 12 : 9);
+    const used = randomInt(3, groups * each - 2);
+    return {
+      type: "drawStory",
+      diagram: diagramLabels.drawStory,
+      question: `有${groups}盒铅笔，每盒${each}支，送给同学${used}支，还剩多少支？`,
+      answer: String(groups * each - used),
+      formula: `${groups} × ${each} - ${used} = ${groups * each - used}`,
+      hint: `先画${groups}个相同的盒子，每盒${each}支，再接“送出${used}支”的箭头。`,
+      explanation: "这是第25课的画法：先画条件，遇到几个几先求总数，再按事情顺序看变化。",
+    };
+  }
+  const a = randomInt(18, hard ? 80 : 45);
+  const b = randomInt(4, Math.min(25, a - 2));
+  const c = randomInt(3, hard ? 36 : 18);
+  return {
+    type: "drawStory",
+    diagram: diagramLabels.drawStory,
+    question: `小红有${a}张贴纸，送出${b}张，又买来${c}张。现在有多少张？`,
+    answer: String(a - b + c),
+    formula: `${a} - ${b} + ${c} = ${a - b + c}`,
+    hint: `${a} → 送出${b} → 买来${c} → 现在？`,
+    explanation: "这是第25课的画法：用箭头图表示事情发生的先后顺序。",
+  };
+}
+
+function drawingArrayQuestion(level) {
+  const hard = level === "challenge" || level === "挑战";
+  const groups = randomInt(3, hard ? 9 : 6);
+  const each = randomInt(3, hard ? 12 : 9);
+  const total = groups * each;
+  if (Math.random() > 0.5) {
+    return {
+      type: "arrayGroup",
+      diagram: diagramLabels.arrayGroup,
+      question: `每盘有${each}个苹果，摆${groups}盘，一共有多少个？`,
+      answer: String(total),
+      formula: `${each} × ${groups} = ${total}`,
+      hint: `画${groups}组，每组${each}个；也可以排成${groups}行${each}列。`,
+      explanation: "这是第26课的画法：乘法表示几个相同的数合起来。",
+    };
+  }
+  return {
+    type: "arrayGroup",
+    diagram: diagramLabels.arrayGroup,
+    question: `${total}颗糖，每${each}颗装一袋，可以装几袋？`,
+    answer: String(groups),
+    formula: `${total} ÷ ${each} = ${groups}`,
+    hint: `画${total}个点，每${each}个圈一组。`,
+    explanation: "这是第26课的画法：看总数里有几个每份数量。",
+  };
+}
+
+function drawingBarQuestion(level) {
+  const hard = level === "challenge" || level === "挑战";
+  const base = randomInt(6, hard ? 24 : 16);
+  const times = randomInt(2, hard ? 5 : 4);
+  if (Math.random() > 0.5) {
+    return {
+      type: "barModel",
+      diagram: diagramLabels.barModel,
+      question: `小明有${base}颗糖，小红是小明的${times}倍。小红有多少颗？`,
+      answer: String(base * times),
+      formula: `${base} × ${times} = ${base * times}`,
+      hint: `小明画1段${base}，小红画${times}段同样长。`,
+      explanation: "这是第27课的画法：几倍就是几个同样长的基准段。",
+    };
+  }
+  const total = base * times;
+  return {
+    type: "barModel",
+    diagram: diagramLabels.barModel,
+    question: `小红有${total}颗糖，是小明的${times}倍。小明有多少颗？`,
+    answer: String(base),
+    formula: `${total} ÷ ${times} = ${base}`,
+    hint: `把小红的${total}平均分成${times}段，每段就是小明的数量。`,
+    explanation: "这是第27课的画法：已知几倍的总量，求一份用除法。",
+  };
+}
+
+function drawingChallengeQuestion(level) {
+  const hard = level === "challenge" || level === "挑战";
+  const makers = [
+    () => {
+      const groups = randomInt(3, hard ? 8 : 5);
+      const each = randomInt(4, hard ? 10 : 8);
+      const used = randomInt(3, groups * each - 2);
+      return {
+        type: "drawingChallenge",
+        diagram: diagramLabels.drawingChallenge,
+        question: `有${groups}盒糖，每盒${each}颗，吃掉${used}颗，还剩多少颗？请说出两种画图方法。`,
+        answer: String(groups * each - used),
+        formula: `${groups} × ${each} - ${used} = ${groups * each - used}`,
+        hint: "方法1画分组图求总数；方法2画线段图表示吃掉和剩下。",
+        explanation: "这是第28课的一题多图：同一题可以先用分组图，再用线段图解释。",
+      };
+    },
+    () => {
+      const total = hard ? 10 : 6;
+      return {
+        type: "drawingChallenge",
+        diagram: diagramLabels.drawingChallenge,
+        open: true,
+        question: `用1元、2元、5元纸币凑成${total}元，至少写出3种方法。`,
+        answer: "示例：全部用1元；用2元和1元；用5元和1元。",
+        formula: "用表格按5元张数、2元张数、1元张数有序列举。",
+        hint: "先固定5元张数，再依次改变2元张数。",
+        explanation: "这是第28课的有序枚举：按顺序列，避免漏掉或重复。",
+      };
+    },
+    () => {
+      const start = randomInt(3, hard ? 12 : 8);
+      const add = randomInt(3, 9);
+      const mul = randomInt(2, 5);
+      const result = (start + add) * mul;
+      return {
+        type: "drawingChallenge",
+        diagram: diagramLabels.drawingChallenge,
+        question: `一个数先加${add}，再乘${mul}，结果是${result}。这个数是多少？`,
+        answer: String(start),
+        formula: `${result} ÷ ${mul} = ${start + add}，${start + add} - ${add} = ${start}`,
+        hint: `从结果${result}倒着走：先除以${mul}，再减${add}。`,
+        explanation: "这是第28课的逆向图：从结果出发，每一步做相反运算。",
+      };
+    },
+  ];
+  return pick(makers)();
+}
+
+function makeDrawingQuestion(mode, level) {
+  const makers = {
+    drawStory: drawingStoryQuestion,
+    arrayGroup: drawingArrayQuestion,
+    barModel: drawingBarQuestion,
+    drawingChallenge: drawingChallengeQuestion,
+  };
+  const types = mode === "mixed" ? Object.keys(makers) : [mode];
+  const type = pick(types);
+  return (makers[type] || drawingChallengeQuestion)(level);
+}
+
+function generateDrawingPractice() {
+  const mode = $("#drawingMode").value;
+  const level = $("#drawingLevel").value;
+  state.drawingQuestions = Array.from({ length: 6 }, () => makeDrawingQuestion(mode, level));
+  state.drawingChecked = false;
+  saveState();
+  renderDrawingPractice();
+}
+
+function renderDrawingPractice() {
+  if (!$("#drawingBoard")) return;
+  if (!state.drawingQuestions.length) {
+    state.drawingQuestions = Array.from({ length: 6 }, () => makeDrawingQuestion("mixed", "core"));
+  }
+
+  const options = ["画图整理条件", "阵列/分组图", "线段/倍数图", "画图思维挑战"];
+  $("#drawingBoard").innerHTML = state.drawingQuestions
+    .map((item, index) => `
+      <article class="drawing-card" data-drawing-index="${index}">
+        <div class="homework-meta"><span class="tag">第${index + 1}题</span><span>${esc(item.diagram)}</span></div>
+        <p><strong>${esc(item.question)}</strong></p>
+        <label>第一步：选择适合的图</label>
+        <select class="drawing-diagram">
+          <option value="">请选择</option>
+          ${options.map((option) => `<option value="${esc(option)}">${esc(option)}</option>`).join("")}
+        </select>
+        <label>第二步：我的答案</label>
+        <input class="drawing-answer" type="text" inputmode="numeric" placeholder="写数字或简短答案" />
+        <details class="answer drawing-detail">
+          <summary>查看解析</summary>
+          <p><strong>推荐图：</strong>${esc(item.diagram)}</p>
+          <p><strong>画法提示：</strong>${esc(item.hint)}</p>
+          <p><strong>算式：</strong>${esc(item.formula)}</p>
+          <p><strong>答案：</strong>${esc(item.answer)}</p>
+          <p>${esc(item.explanation)}</p>
+        </details>
+      </article>
+    `)
+    .join("");
+}
+
+function normalizeAnswer(value) {
+  return String(value).replace(/[^0-9一-龥]/g, "");
+}
+
+function checkDrawingAnswers() {
+  let correct = 0;
+  document.querySelectorAll(".drawing-card").forEach((card) => {
+    const index = Number(card.dataset.drawingIndex);
+    const item = state.drawingQuestions[index];
+    const diagramRight = $(".drawing-diagram", card).value === item.diagram;
+    const answer = normalizeAnswer($(".drawing-answer", card).value.trim());
+    const target = normalizeAnswer(item.answer);
+    const answerRight = item.open ? answer.length > 0 : answer.includes(target) || target.includes(answer);
+    const right = diagramRight && answerRight;
+    card.classList.toggle("correct", right);
+    card.classList.toggle("wrong", !right);
+    if (right) correct += 1;
+  });
+  $(".drawing-result")?.remove();
+  $("#drawingBoard").insertAdjacentHTML("beforeend", `<div class="drawing-result">本次完全正确 ${correct}/6。开放题重点看图、算式和解释是否说得清。</div>`);
+}
+
+
 function renderMistakes() {
   if (!state.mistakes.length) {
     $("#mistakeList").innerHTML = '<div class="empty-state">还没有错题记录。完成练习后，把最典型的1-2个问题记在这里。</div>';
@@ -3036,6 +3590,22 @@ function bindEvents() {
   });
 
   $("#lessonDetail").addEventListener("click", (event) => {
+    const stepButton = event.target.closest("[data-lesson-step]");
+    if (stepButton) {
+      setLessonStep(state.currentLessonId, stepButton.dataset.lessonStep);
+      renderOverview();
+      renderLesson();
+      return;
+    }
+
+    const toggleStepButton = event.target.closest("[data-toggle-step]");
+    if (toggleStepButton) {
+      toggleLessonStep(state.currentLessonId, toggleStepButton.dataset.toggleStep);
+      renderOverview();
+      renderLesson();
+      return;
+    }
+
     const navButton = event.target.closest("[data-lesson-nav]");
     if (navButton) {
       const offset = navButton.dataset.lessonNav === "next" ? 1 : -1;
@@ -3062,6 +3632,8 @@ function bindEvents() {
   });
 
   $("#checkOverlap").addEventListener("click", checkOverlap);
+  $("#generateDrawing").addEventListener("click", generateDrawingPractice);
+  $("#checkDrawing").addEventListener("click", checkDrawingAnswers);
 
   $("#mistakeForm").addEventListener("submit", addMistake);
   $("#mistakeList").addEventListener("click", (event) => {
