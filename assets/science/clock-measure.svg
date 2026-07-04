@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Clock and measurement illustration">
+  <rect width="800" height="600" fill="#f8fbff"/>
+  <circle cx="268" cy="300" r="154" fill="#fff" stroke="#295a77" stroke-width="14"/>
+  <g stroke="#295a77" stroke-width="8" stroke-linecap="round">
+    <path d="M268 160v30M268 410v30M128 300h30M378 300h30M172 202l22 22M342 376l22 22M172 398l22-22M342 224l22-22"/>
+    <path d="M268 300V218M268 300l76 46" stroke-width="12"/>
+  </g>
+  <rect x="496" y="180" width="150" height="240" rx="18" fill="#fff4cf" stroke="#c79d34" stroke-width="10"/>
+  <g stroke="#c79d34" stroke-width="6">
+    <path d="M522 220h98M522 264h98M522 308h98M522 352h98"/>
+    <path d="M550 196v228M594 196v228"/>
+  </g>
+</svg>

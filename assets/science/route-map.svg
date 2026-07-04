@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Route map illustration">
+  <rect width="800" height="600" fill="#f7fbf6"/>
+  <path d="M96 176h216M96 302h148M472 128h216M436 430h232" stroke="#d7e7cd" stroke-width="22" stroke-linecap="round"/>
+  <path d="M158 414c74-18 124-70 120-128-6-80 70-150 154-142 62 6 104 58 104 112 0 42-24 78-60 104-52 38-64 84-40 140" fill="none" stroke="#3c8b66" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="158" cy="414" r="24" fill="#f06f59"/>
+  <circle cx="278" cy="298" r="20" fill="#ffd06b"/>
+  <circle cx="432" cy="268" r="20" fill="#7bc9d9"/>
+  <circle cx="540" cy="182" r="20" fill="#f06f59"/>
+  <circle cx="604" cy="394" r="24" fill="#295a77"/>
+</svg>

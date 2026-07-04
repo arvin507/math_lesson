@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Solar engineering illustration">
+  <rect width="800" height="600" fill="#eef8ff"/>
+  <circle cx="126" cy="116" r="54" fill="#ffd465"/>
+  <path d="M126 28v42M126 162v42M38 116h42M172 116h42M64 54l30 30M158 148l30 30M64 178l30-30M158 84l30-30" stroke="#ffd465" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="160,420 442,310 638,420 352,530" fill="#264f70"/>
+  <g fill="none" stroke="#76bfe2" stroke-width="6">
+    <path d="M198 405 390 332M248 428 440 354M296 450 488 376M346 472 536 398"/>
+    <path d="M240 388 278 507M296 366 334 485M354 344 392 463M412 322 450 441M472 334 510 453M530 356 568 475"/>
+  </g>
+  <path d="M0 480h800v120H0z" fill="#b9d89b"/>
+</svg>

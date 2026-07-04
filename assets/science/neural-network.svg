@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Neural network illustration">
+  <rect width="800" height="600" fill="#f7fbff"/>
+  <g stroke="#8fb2cb" stroke-width="6">
+    <path d="M170 150 350 110M170 150 350 240M170 300 350 110M170 300 350 240M170 450 350 240M170 450 350 390"/>
+    <path d="M350 110 560 150M350 110 560 300M350 240 560 150M350 240 560 300M350 390 560 300M350 390 560 450"/>
+  </g>
+  <g fill="#4f86a7">
+    <circle cx="170" cy="150" r="34"/>
+    <circle cx="170" cy="300" r="34"/>
+    <circle cx="170" cy="450" r="34"/>
+  </g>
+  <g fill="#7bc9d9">
+    <circle cx="350" cy="110" r="38"/>
+    <circle cx="350" cy="240" r="38"/>
+    <circle cx="350" cy="390" r="38"/>
+  </g>
+  <g fill="#ffc96d">
+    <circle cx="560" cy="150" r="34"/>
+    <circle cx="560" cy="300" r="34"/>
+    <circle cx="560" cy="450" r="34"/>
+  </g>
+  <circle cx="688" cy="300" r="50" fill="#f06f59"/>
+  <path d="M610 300h78" stroke="#8fb2cb" stroke-width="8" stroke-linecap="round"/>
+</svg>

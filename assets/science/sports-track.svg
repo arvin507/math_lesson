@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Sports and data illustration">
+  <rect width="800" height="600" fill="#f6fbff"/>
+  <path d="M90 440c46-110 144-176 286-176h272v188H90Z" fill="#de6151"/>
+  <path d="M128 440c40-82 126-134 248-134h232v92H128Z" fill="none" stroke="#fff" stroke-width="8"/>
+  <path d="M166 440c34-56 106-92 210-92h192" fill="none" stroke="#fff" stroke-width="8"/>
+  <rect x="108" y="148" width="220" height="170" rx="18" fill="#ffffff" stroke="#bddfee" stroke-width="10"/>
+  <rect x="146" y="242" width="34" height="40" fill="#7bc9d9"/>
+  <rect x="198" y="214" width="34" height="68" fill="#4f86a7"/>
+  <rect x="250" y="182" width="34" height="100" fill="#ffd06b"/>
+  <path d="M146 176h138" stroke="#8ea4ad" stroke-width="8" stroke-linecap="round"/>
+</svg>

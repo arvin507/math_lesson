@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Animal study illustration">
+  <rect width="800" height="600" fill="#f7fbf3"/>
+  <rect x="0" y="430" width="800" height="170" fill="#d7ebb9"/>
+  <g transform="translate(120 236)">
+    <ellipse cx="100" cy="84" rx="84" ry="64" fill="#f0b76d"/>
+    <circle cx="182" cy="54" r="34" fill="#f0b76d"/>
+    <path d="M168 24l16-34 18 30" fill="#f0b76d"/>
+    <circle cx="193" cy="52" r="5" fill="#283946"/>
+    <path d="M198 90q22 18 16 54" fill="none" stroke="#c47b43" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(344 280)">
+    <ellipse cx="84" cy="74" rx="88" ry="56" fill="#6db7d8"/>
+    <path d="M170 70l56-26-26 52Z" fill="#6db7d8"/>
+    <circle cx="52" cy="60" r="6" fill="#1e4358"/>
+  </g>
+  <g transform="translate(566 248)">
+    <circle cx="62" cy="56" r="46" fill="#7cc27a"/>
+    <circle cx="40" cy="44" r="7" fill="#1f3a28"/>
+    <circle cx="84" cy="44" r="7" fill="#1f3a28"/>
+    <path d="M28 112h68" stroke="#4f8f4d" stroke-width="12" stroke-linecap="round"/>
+  </g>
+</svg>

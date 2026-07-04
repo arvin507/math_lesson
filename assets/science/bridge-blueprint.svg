@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Bridge blueprint illustration">
+  <rect width="800" height="600" fill="#f4f8fb"/>
+  <rect x="0" y="420" width="800" height="180" fill="#d8edf7"/>
+  <path d="M88 420h624" stroke="#2b5f7c" stroke-width="12" stroke-linecap="round"/>
+  <path d="M200 420V148M600 420V148" stroke="#e56a54" stroke-width="22" stroke-linecap="round"/>
+  <path d="M200 170c54 76 114 130 200 178 88-48 148-102 200-178" fill="none" stroke="#2b5f7c" stroke-width="10"/>
+  <g stroke="#7ca5bc" stroke-width="6">
+    <path d="M240 196 280 420M292 238 332 420M344 272 384 420M456 272 416 420M508 238 468 420M560 196 520 420"/>
+  </g>
+  <path d="M112 132h150M112 160h218M112 188h124" stroke="#9ec0d4" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -1555,6 +1555,7 @@ function renderOverview() {
             ${weekLessons
               .map((lesson) => {
                 const ability = abilityById(lesson.ability);
+                const exploration = lesson.upgraded.exploration;
                 const progress = lessonProgressFor(lesson.id);
                 const stepDone = progress.completedSteps.length;
                 return `
@@ -1567,6 +1568,8 @@ function renderOverview() {
                         <span class="tag">${esc(ability.title)}</span>
                         <span class="tag">${stepDone}/${lesson.upgraded.steps.length}步</span>
                         <span class="tag">${esc(lesson.upgraded.visualTasks[0].name)}</span>
+                        ${exploration ? `<span class="tag tag-university">${esc(exploration.university.shortName)}</span>` : ""}
+                        ${exploration ? `<span class="tag tag-science">${esc(exploration.science.title.split(" · ")[0])}</span>` : ""}
                         ${isDone(lesson.id) ? '<span class="tag">已完成</span>' : ""}
                       </span>
                     </span>
@@ -1606,6 +1609,7 @@ function renderLesson() {
           </label>
         </div>
       </header>
+      ${renderExplorationWindow(lesson)}
       <div class="studio-progress">
         <div>
           <strong>学习地图</strong>
@@ -1630,6 +1634,7 @@ function renderLesson() {
       <div class="studio-grid">
         <section class="studio-main">
           ${renderStepPanel(lesson, currentStep, progress)}
+          ${renderLessonSection("今日探索任务", renderExplorationTask(lesson))}
           ${renderLessonSection("图形实验", `${renderVisual(lesson)}${renderVisualTasks(lesson)}`)}
           ${renderLessonSection("跟画例题", renderWorkedExample(lesson))}
           ${renderLessonSection("独立闯关", renderPracticeSets(lesson.upgraded.practiceSets))}
@@ -1639,10 +1644,91 @@ function renderLesson() {
         <aside class="studio-side">
           ${renderLessonSection("自学提示", renderSelfStudyCard(lesson))}
           ${renderLessonSection("卡住时看", renderStuckHints(lesson))}
+          ${renderLessonSection("成长型鼓励", renderGrowthTalk(lesson))}
           ${renderLessonSection("可选陪学追问", renderParentOptional(lesson))}
           ${renderLessonSection("自查复盘", renderSelfCheck(lesson))}
         </aside>
       </div>
+    </article>
+  `;
+}
+
+function renderImageCredit(image) {
+  if (!image?.source) return image?.credit ? `<span>${esc(image.credit)}</span>` : "";
+  return `<a href="${esc(image.source)}" target="_blank" rel="noopener">图片：${esc(image.credit || "来源")}</a>`;
+}
+
+function renderExplorationWindow(lesson) {
+  const exploration = lesson.upgraded.exploration;
+  if (!exploration) return "";
+  const university = exploration.university;
+  const science = exploration.science;
+  return `
+    <section class="exploration-window" aria-label="今日世界探索">
+      <div class="exploration-intro">
+        <p class="eyebrow">今日世界探索</p>
+        <h2>${esc(exploration.role)}</h2>
+        <p>${esc(exploration.hook)}</p>
+        <div class="exploration-badge">${esc(exploration.badge)}</div>
+      </div>
+      <article class="postcard-card">
+        <img src="${esc(university.image.url)}" alt="${esc(university.image.alt)}" loading="lazy" />
+        <div>
+          <span class="kid-label">今日大学明信片</span>
+          <strong>${esc(university.name)}</strong>
+          <p>${esc(university.location)}</p>
+          <p>${esc(university.tagline)}</p>
+          <div class="image-credit">${renderImageCredit(university.image)}</div>
+        </div>
+      </article>
+      <article class="science-card">
+        <img src="${esc(science.image.url)}" alt="${esc(science.image.alt)}" loading="lazy" />
+        <div>
+          <span class="kid-label">前沿科学图鉴</span>
+          <strong>${esc(science.title)}</strong>
+          <p>${esc(science.childText)}</p>
+          <p class="math-link">${esc(exploration.mathLink)}</p>
+          <div class="image-credit">${renderImageCredit(science.image)}</div>
+        </div>
+      </article>
+    </section>
+  `;
+}
+
+function renderExplorationTask(lesson) {
+  const exploration = lesson.upgraded.exploration;
+  if (!exploration?.task) return `<p>${esc(lesson.lifeIntro)}</p>`;
+  const [level, question, answer, explanation] = exploration.task;
+  return `
+    <article class="exploration-task-card">
+      <div class="practice-head">
+        <span class="exercise-level ${exerciseLevelClass(level)}">${esc(level)}</span>
+        <span class="tag tag-science">${esc(exploration.science.title)}</span>
+      </div>
+      <h3>${esc(exploration.mission)}</h3>
+      <p>${esc(question)}</p>
+      <div class="draw-hint"><strong>数学连接：</strong>${esc(exploration.mathLink)}</div>
+      <details class="answer">
+        <summary>查看答案解析</summary>
+        <p><strong>答案：</strong>${esc(answer)}</p>
+        <p>${esc(explanation)}</p>
+      </details>
+    </article>
+  `;
+}
+
+function renderGrowthTalk(lesson) {
+  const exploration = lesson.upgraded.exploration;
+  const childGuide = lesson.upgraded.childGuide;
+  if (!exploration) return `<p class="child-say">${esc(childGuide?.slogan || lesson.method)}</p>`;
+  return `
+    <article class="growth-card">
+      <strong>可以这样夸孩子</strong>
+      <p>${esc(exploration.growthTalk)}</p>
+      <strong>继续追问</strong>
+      <p>${esc(exploration.hook)}</p>
+      <strong>今日徽章</strong>
+      <p class="exploration-badge small">${esc(exploration.badge)}</p>
     </article>
   `;
 }
@@ -3722,6 +3808,360 @@ function bindEvents() {
   });
   $("#printButton").addEventListener("click", () => window.print());
 }
+
+function renderOverview() {
+  const focusLesson = lessons.find((lesson) => !isDone(lesson.id)) || lessons[0];
+  const focusAbility = abilityById(focusLesson.ability);
+  const focusExploration = focusLesson.upgraded.exploration;
+
+  $("#completedCount").textContent = String(state.completed.length);
+
+  const summaryEyebrow = $(".summary-copy .eyebrow");
+  const summaryTitle = $("#overview-title");
+  const summaryLede = $(".summary-copy .lede");
+  if (summaryEyebrow) summaryEyebrow.textContent = "7周探险 / 28节任务课 / 大学明信片 / 前沿科学 / 数学闯关";
+  if (summaryTitle) summaryTitle.textContent = "和机器人、太空站、大学实验室一起玩数学";
+  if (summaryLede) {
+    summaryLede.textContent =
+      "这不是一堆枯燥练习题，而是一张张真正能出发的探索任务单。每一课都带孩子认识一个真实世界里的大学或科学主题，再用二年级小朋友也能听懂的数学办法，把问题慢慢看清楚、想明白、做出来。";
+  }
+
+  $(".mini-grid").innerHTML = lessons
+    .map((lesson) => `<span class="${isDone(lesson.id) ? "is-done" : ""}" title="第${lesson.number}课：${esc(lesson.title)}"></span>`)
+    .join("");
+
+  if ($("#overviewRunway")) {
+    $("#overviewRunway").innerHTML = `
+      <div class="overview-stop">
+        <span>下一站任务</span>
+        <strong>第${focusLesson.number}课：${esc(focusLesson.title)}</strong>
+        <p>${esc(focusLesson.upgraded.meta.output)}</p>
+      </div>
+      <div class="overview-stop">
+        <span>今天会遇见</span>
+        <strong>${esc(focusExploration?.role || "小小数学探索员")}</strong>
+        <p>${esc(focusExploration?.hook || "先观察，再动脑，最后用数学把线索连起来。")}</p>
+      </div>
+      <div class="overview-stop">
+        <span>会去哪里</span>
+        <strong>${esc(focusExploration?.university.name || "真实世界里的大学")}</strong>
+        <p>${esc(focusExploration?.science.title || "前沿科学现场")}会和今天的数学方法连在一起。</p>
+      </div>
+      <div class="overview-stop">
+        <span>这周重点</span>
+        <strong>${esc(focusAbility?.title || "数学能力")}慢慢长出来</strong>
+        <p>${esc(focusLesson.upgraded.meta.mission)}</p>
+      </div>
+    `;
+  }
+
+  $("#abilityStrip").innerHTML = abilities
+    .map((ability) => {
+      const count = lessons.filter((lesson) => lesson.ability === ability.id).length;
+      const done = lessons.filter((lesson) => lesson.ability === ability.id && isDone(lesson.id)).length;
+      const mission =
+        lessons.find((lesson) => lesson.ability === ability.id)?.upgraded.meta.mission || "先看清楚，再说出理由。";
+      return `
+        <article class="ability-pill">
+          <strong>${esc(ability.title)} · ${done}/${count}</strong>
+          <span>${esc(ability.summary)}</span>
+          <small>${esc(mission)}</small>
+        </article>
+      `;
+    })
+    .join("");
+
+  $("#weekOverview").innerHTML = weeks
+    .map((week) => {
+      const weekLessons = lessons.filter((lesson) => lesson.week === week.number);
+      const done = weekLessons.filter((lesson) => isDone(lesson.id)).length;
+      return `
+        <article class="week-block">
+          <div class="week-title">
+            <div>
+              <h3>第${week.number}周：${esc(week.title)}</h3>
+              <p>${esc(week.goal)}</p>
+            </div>
+            <div class="week-progress">${done}/4</div>
+          </div>
+          <div class="lesson-grid">
+            ${weekLessons
+              .map((lesson) => {
+                const ability = abilityById(lesson.ability);
+                const exploration = lesson.upgraded.exploration;
+                const progress = lessonProgressFor(lesson.id);
+                const stepDone = progress.completedSteps.length;
+                return `
+                  <button class="lesson-card ${isDone(lesson.id) ? "is-done" : ""}" type="button" data-lesson-id="${lesson.id}">
+                    <span class="lesson-number">${lesson.number}</span>
+                    <span>
+                      <strong>${esc(lesson.title)}</strong>
+                      <span>${esc(lesson.upgraded.meta.output)}</span>
+                      <span class="tag-row">
+                        <span class="tag">${esc(ability.title)}</span>
+                        <span class="tag">${stepDone}/${lesson.upgraded.steps.length}步</span>
+                        <span class="tag">${esc(lesson.upgraded.visualTasks[0].name)}</span>
+                        ${exploration ? `<span class="tag tag-university">${esc(exploration.university.shortName)}</span>` : ""}
+                        ${exploration ? `<span class="tag tag-science">${esc(exploration.science.title.split(" · ")[0])}</span>` : ""}
+                        ${isDone(lesson.id) ? '<span class="tag">已完成</span>' : ""}
+                      </span>
+                    </span>
+                  </button>
+                `;
+              })
+              .join("")}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderImageCredit(image) {
+  if (!image?.source) return image?.credit ? `<span>${esc(image.credit)}</span>` : "";
+  return `<a href="${esc(image.source)}" target="_blank" rel="noopener">图片来源：${esc(image.credit || "来源")}</a>`;
+}
+
+function universityPrimer(university) {
+  const copy = {
+    Caltech: {
+      story: "这里很喜欢研究星星、火箭和特别难的工程问题，很多大朋友会把一个超大的问题拆成很多小步骤，再一点点弄明白。",
+      notice: "先看看照片里的校园，你觉得哪一栋楼最像会藏着神奇实验？",
+      dream: "如果你走进这里，可以先问一句：“今天谁在研究最酷的新发现？”",
+    },
+    MIT: {
+      story: "这里常把脑袋里的想法做成真的机器、真的模型和真的发明，所以“会想”也要配上“会动手”。",
+      notice: "看图时留意大楼和空地，想一想机器人比赛会不会就在这样的地方发生。",
+      dream: "如果你去参观，可以试着找找看，哪一间教室里最可能有机器人在工作。",
+    },
+    "清华": {
+      story: "这里有很多工程、计算机和航天研究，像一座把点子变成作品的大工坊。",
+      notice: "看看校园里的路、树和建筑，你觉得哪个地方最像可以做发射任务或造新机器？",
+      dream: "如果你在这里上半天课，也许会想把自己的数学办法变成一个真正能用的小工具。",
+    },
+    Cambridge: {
+      story: "很多重要科学发现都和这里有关，科学家最喜欢问的不是“我会不会”，而是“证据够不够”。",
+      notice: "看这张图时，可以找找最像实验室的地方，想一想里面会不会有人正在反复检查结果。",
+      dream: "如果你站在这里，也可以像小科学家一样，对着一个问题连问三次“为什么”。",
+    },
+    Stanford: {
+      story: "这里常常把新想法、新技术和新问题放在一起试试看，所以很适合大胆想、慢慢做。",
+      notice: "你可以观察这张校园图，猜一猜哪一块地方最像会冒出新点子。",
+      dream: "如果你来到这里，也许会想设计一个既好玩又有用的小发明。",
+    },
+    ETH: {
+      story: "这里很会把复杂的大问题拆成一块一块来研究，所以特别适合练“先拆开，再解决”的本领。",
+      notice: "看照片时，试着找一找最整齐、最像工程师会工作的地方。",
+      dream: "如果你也当小工程师，第一步不是急着算，而是先把大问题切成好算的小块。",
+    },
+    Oxford: {
+      story: "这里喜欢认真观察、分类和比较，很多看起来乱糟糟的事情，整理以后就会变清楚。",
+      notice: "看看建筑和院子，你会不会想到“安静地观察，然后慢慢发现规律”的感觉？",
+      dream: "如果你在这里散步，可能会边走边做一个‘找相同、找不同’的小挑战。",
+    },
+    Harvard: {
+      story: "这里有很多人会收集数据、画图表、做报告，把零零散散的信息整理成大家都能看懂的答案。",
+      notice: "看图的时候想一想，如果要在这里做一个小展示，你最想讲哪一种发现？",
+      dream: "如果轮到你当小研究员，你也可以把自己的数学发现讲给别人听。",
+    },
+    CMU: {
+      story: "这里的机器人和计算机研究很有名，很多机器要先学会看、判断，再决定怎么行动。",
+      notice: "你可以看看图片，想象一下机器人如果走在这里，要先认清哪些方向和位置。",
+      dream: "如果你要带机器人完成任务，第一件事就是帮它把信息看清楚。",
+    },
+    "同济": {
+      story: "这里的建筑、设计和工程很有特色，很多看不见的结构，都会先在图纸里变清楚。",
+      notice: "看看这张图，你觉得哪里最像建筑师会一边画图一边讨论的地方？",
+      dream: "如果你也来设计，会不会先画一个草图，再决定每一步怎么做？",
+    },
+  };
+
+  return (
+    copy[university.shortName] || {
+      story: "大学像一座很大的好奇心工厂，很多大朋友会把“为什么”变成实验、模型和真正能用的新东西。",
+      notice: "先看看图片里最吸引你的地方，再猜一猜这里的人每天在研究什么。",
+      dream: "如果你去参观，也可以带着一个“为什么”出发。",
+    }
+  );
+}
+
+function sciencePrimer(exploration) {
+  const title = exploration.science.title;
+  if (/(火星|太空|航天|空间站|基地)/.test(title)) {
+    return {
+      story: "太空任务离我们很远，越是远的地方，越要把数字算准，因为一丁点小错误都可能让任务走偏。",
+      notice: "看图的时候，试着想一想：如果你在太空里，最怕漏掉哪一个小细节？",
+      question: "为什么科学家做太空任务时，总爱一遍又一遍地检查？",
+    };
+  }
+  if (/(机器人|人工智能|AI)/.test(title)) {
+    return {
+      story: "机器人和 AI 不会自己突然变聪明，它们也需要先把信息看清楚、分整齐，才能一步步做对事。",
+      notice: "先找图里最像会动起来的部分，再想想它要听懂多少信息才能顺利工作。",
+      question: "如果让机器来帮忙，它最需要我们先告诉它什么？",
+    };
+  }
+  if (/(工程|设计|蓝图|能源|桥|建筑)/.test(title)) {
+    return {
+      story: "工程不是一下子把大东西做出来，而是先拆开、比较、试一试，再把小部分连成大作品。",
+      notice: "观察图片时，可以先看最大的一部分，再看它是由哪些小部分组成的。",
+      question: "一个看起来很大的问题，能不能先拆成几个更容易的小问题？",
+    };
+  }
+  if (/(数据|表格|规律|分类|研究|展示)/.test(title)) {
+    return {
+      story: "很多科学发现都不是一下子跳出来的，而是先把线索摆整齐，再从里面看出规律和答案。",
+      notice: "看图时想一想：如果线索很多很乱，你会先怎么整理？",
+      question: "当信息一大堆的时候，什么办法能让它们乖乖排好队？",
+    };
+  }
+  return {
+    story: "前沿科学最迷人的地方，就是它会把“这也能研究吗”变成真的问题，再慢慢找到办法。",
+    notice: "先看图里最特别的部分，再猜一猜它为什么值得大家研究。",
+    question: "如果今天由你来继续探索，你最想先问什么？",
+  };
+}
+
+function renderExplorationWindow(lesson) {
+  const exploration = lesson.upgraded.exploration;
+  if (!exploration) return "";
+  const university = exploration.university;
+  const science = exploration.science;
+  const universityCopy = universityPrimer(university);
+  const scienceCopy = sciencePrimer(exploration);
+
+  return `
+    <section class="exploration-window" aria-label="今日世界探索">
+      <div class="exploration-hero">
+        <div class="exploration-copy">
+          <p class="eyebrow">今日世界探索</p>
+          <div class="exploration-heading">
+            <h2>${esc(exploration.role)}</h2>
+            <div class="exploration-badge">${esc(exploration.badge)}</div>
+          </div>
+          <p class="exploration-lede">${esc(exploration.hook)}</p>
+          <p class="exploration-voice">今天这一课，不只是做题。你会像真正的小小探索员一样，先观察，再猜想，最后用数学把线索连起来。</p>
+        </div>
+        <div class="exploration-hero-image">
+          <img src="${esc(university.image.url)}" alt="${esc(university.image.alt)}" loading="lazy" />
+          <div class="exploration-stamp">
+            <strong>${esc(university.name)}</strong>
+            <span>${esc(university.location)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exploration-rail" aria-label="探索路线">
+        <div class="exploration-rail-item">
+          <span>先看图</span>
+          <p>${esc(universityCopy.notice)}</p>
+        </div>
+        <div class="exploration-rail-item">
+          <span>再想想</span>
+          <p>${esc(scienceCopy.question)}</p>
+        </div>
+        <div class="exploration-rail-item">
+          <span>去完成</span>
+          <p>${esc(exploration.mission)}</p>
+        </div>
+      </div>
+
+      <section class="exploration-detail university-detail">
+        <div class="exploration-detail-media">
+          <img src="${esc(university.image.url)}" alt="${esc(university.image.alt)}" loading="lazy" />
+        </div>
+        <div class="exploration-detail-copy">
+          <span class="kid-label">今日大学明信片</span>
+          <h3>${esc(university.name)}</h3>
+          <p class="detail-kicker">${esc(university.tagline)}</p>
+          <p>${esc(universityCopy.story)}</p>
+          <ul class="plain-list">
+            <li>${esc(universityCopy.notice)}</li>
+            <li>${esc(universityCopy.dream)}</li>
+          </ul>
+          <div class="image-credit">${renderImageCredit(university.image)}</div>
+        </div>
+      </section>
+
+      <section class="exploration-detail science-detail">
+        <div class="exploration-detail-copy">
+          <span class="kid-label">前沿科学看一看</span>
+          <h3>${esc(science.title)}</h3>
+          <p class="detail-kicker">${esc(science.childText)}</p>
+          <p>${esc(scienceCopy.story)}</p>
+          <ul class="plain-list">
+            <li>${esc(scienceCopy.notice)}</li>
+            <li>${esc(scienceCopy.question)}</li>
+          </ul>
+          <p class="math-link">${esc(exploration.mathLink)}</p>
+          <p class="exploration-growth">${esc(exploration.growthTalk)}</p>
+          <div class="image-credit">${renderImageCredit(science.image)}</div>
+        </div>
+        <div class="exploration-detail-media">
+          <img src="${esc(science.image.url)}" alt="${esc(science.image.alt)}" loading="lazy" />
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+const localExplorationImageMap = {
+  "Caltech_Entrance.jpg": "assets/universities/caltech-entrance.jpg",
+  "MIT_Main_Campus_aerial.jpg": "assets/universities/mit-campus.jpg",
+  "Tsinghua_Garden1.jpg": "assets/universities/tsinghua-garden.jpg",
+  "The_Cavendish_Laboratory_-_geograph.org.uk_-_631839.jpg": "assets/universities/cavendish-lab.jpg",
+  "View_Stanford.jpg": "assets/universities/stanford-view.jpg",
+  "ETH_Zürich_am_Abend.jpg": "assets/universities/eth-zurich.jpg",
+  "Mob_Quad_from_Chapel_Tower.jpg": "assets/universities/oxford-quad.jpg",
+  "HarvardYard.jpg": "assets/universities/harvard-yard.jpg",
+  "Gates-Hillman_Complex_at_Carnegie_Mellon_University_2.jpg": "assets/universities/cmu-gates-hillman.jpg",
+  "Tongji_sipin.jpg": "assets/universities/tongji-campus.jpg",
+  "Curiosity Self-Portrait at 'Big Sky' Drilling Site.jpg": "assets/science/mars-rover.jpg",
+  "FANUC_6-axis_welding_robots.jpg": "assets/science/robot-arm.jpg",
+  "Apollo_11_Launch_-_GPN-2000-000630.jpg": "assets/science/apollo-launch.jpg",
+  "Colored_neural_network.svg": "assets/science/neural-network.svg",
+  "Solar_array-3.jpg": "assets/science/solar-array.jpg",
+  "Golden_Gate_Bridge_as_seen_from_Battery_East.jpg": "assets/science/bridge.jpg",
+  "Animal_diversity.png": "assets/science/animal-diversity.png",
+  "The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg": "assets/science/iss.jpg",
+  "Clock_simple.svg": "assets/science/clock.svg",
+  "Athletics_pictogram.svg": "assets/science/sports.svg",
+  "OSIRIS_Mars_true_color.jpg": "assets/science/mars-surface.jpg",
+  "Openstreetmap_logo.svg": "assets/science/map.svg",
+};
+
+Object.assign(localExplorationImageMap, {
+  "Curiosity Self-Portrait at 'Big Sky' Drilling Site.jpg": "assets/science/space-explore.svg",
+  "FANUC_6-axis_welding_robots.jpg": "assets/science/robot-lab.svg",
+  "Apollo_11_Launch_-_GPN-2000-000630.jpg": "assets/science/space-explore.svg",
+  "Colored_neural_network.svg": "assets/science/neural-network.svg",
+  "Solar_array-3.jpg": "assets/science/solar-grid.svg",
+  "Golden_Gate_Bridge_as_seen_from_Battery_East.jpg": "assets/science/bridge-blueprint.svg",
+  "Animal_diversity.png": "assets/science/animal-study.svg",
+  "The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg": "assets/science/space-explore.svg",
+  "Clock_simple.svg": "assets/science/clock-measure.svg",
+  "Athletics_pictogram.svg": "assets/science/sports-track.svg",
+  "OSIRIS_Mars_true_color.jpg": "assets/science/mars-surface.svg",
+  "Openstreetmap_logo.svg": "assets/science/route-map.svg",
+});
+
+function localizeExplorationImage(image) {
+  if (!image?.source) return;
+  const fileKey = decodeURIComponent(image.source.split("File:")[1] || "");
+  const localPath = localExplorationImageMap[fileKey];
+  if (localPath) image.url = localPath;
+}
+
+function localizeExplorationImages() {
+  lessons.forEach((lesson) => {
+    const exploration = lesson.upgraded?.exploration;
+    if (!exploration) return;
+    localizeExplorationImage(exploration.university?.image);
+    localizeExplorationImage(exploration.science?.image);
+  });
+}
+
+localizeExplorationImages();
 
 renderAll();
 bindEvents();
