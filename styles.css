@@ -2471,8 +2471,8 @@ details.answer p {
 }
 
 .exploration-window {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0;
   padding: 0;
   background:
@@ -2486,7 +2486,9 @@ details.answer p {
 .exploration-hero,
 .exploration-rail,
 .exploration-detail {
-  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
 }
 
 .exploration-hero {
