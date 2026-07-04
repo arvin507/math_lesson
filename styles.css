@@ -2607,6 +2607,10 @@ details.answer p {
   padding: clamp(22px, 4vw, 34px);
 }
 
+.exploration-detail.no-media {
+  grid-template-columns: 1fr;
+}
+
 .science-detail {
   background: rgba(233, 245, 255, 0.42);
 }

@@ -1658,6 +1658,93 @@ function renderImageCredit(image) {
   return `<a href="${esc(image.source)}" target="_blank" rel="noopener">图片：${esc(image.credit || "来源")}</a>`;
 }
 
+function createLocalImage(url, alt, credit, source) {
+  return { url, alt, credit, source };
+}
+
+function getGalleryImages(subject) {
+  if (Array.isArray(subject?.gallery) && subject.gallery.length) return subject.gallery;
+  return subject?.image ? [subject.image] : [];
+}
+
+const localUniversityOverrideMap = {
+  Caltech: {
+    location: "美国 · 加利福尼亚州帕萨迪纳",
+    gallery: [
+      createLocalImage("assets/universities/caltech-entrance.jpg", "加州理工学院入口", "本地大学图库", "https://www.caltech.edu/"),
+    ],
+  },
+  MIT: {
+    location: "美国 · 马萨诸塞州剑桥市",
+    gallery: [
+      createLocalImage("assets/universities/mit-campus.jpg", "麻省理工学院校园鸟瞰", "本地大学图库", "https://www.mit.edu/"),
+    ],
+  },
+  "清华": {
+    location: "中国 · 北京",
+    gallery: [
+      createLocalImage("assets/universities/tsinghua-garden.jpg", "清华大学校园景观", "本地大学图库", "https://www.tsinghua.edu.cn/"),
+    ],
+  },
+  Cambridge: {
+    location: "英国 · 剑桥",
+    gallery: [
+      createLocalImage("assets/universities/cavendish-lab.jpg", "剑桥大学学院建筑", "本地大学图库", "https://www.cam.ac.uk/"),
+    ],
+  },
+  Stanford: {
+    location: "美国 · 加利福尼亚州斯坦福",
+    gallery: [
+      createLocalImage("assets/universities/stanford-view.jpg", "斯坦福大学校园远景", "本地大学图库", "https://www.stanford.edu/"),
+    ],
+  },
+  ETH: {
+    location: "瑞士 · 苏黎世",
+    gallery: [
+      createLocalImage("assets/universities/eth-zurich.jpg", "苏黎世联邦理工学院校园景观", "本地大学图库", "https://ethz.ch/en.html"),
+    ],
+  },
+  Oxford: {
+    location: "英国 · 牛津",
+    gallery: [
+      createLocalImage("assets/universities/oxford-radcliffe.jpg", "牛津大学拉德克利夫图书馆外景", "Bodleian Libraries", "https://www.bodleian.ox.ac.uk/libraries/radcliffe-camera"),
+      createLocalImage("assets/universities/oxford-radcliffe-2.jpg", "牛津大学拉德克利夫图书馆与周边建筑", "Bodleian Libraries", "https://www.bodleian.ox.ac.uk/libraries/radcliffe-camera"),
+    ],
+  },
+  Harvard: {
+    location: "美国 · 马萨诸塞州剑桥市",
+    gallery: [
+      createLocalImage("assets/universities/harvard-gate.jpg", "哈佛大学校园大门", "Harvard Gazette", "https://news.harvard.edu/gazette/story/2013/08/harvards-gates-on-the-screen/"),
+      createLocalImage("assets/universities/harvard-gate-2.jpg", "哈佛大学另一处校门景观", "Harvard Gazette", "https://news.harvard.edu/gazette/story/2013/08/harvards-gates-on-the-screen/"),
+    ],
+  },
+  CMU: {
+    location: "美国 · 宾夕法尼亚州匹兹堡",
+    gallery: [
+      createLocalImage("assets/universities/cmu-gates.jpg", "卡内基梅隆大学盖茨中心外景", "CMU School of Computer Science", "https://www.cs.cmu.edu/photopages/gates.html"),
+      createLocalImage("assets/universities/cmu-gates-2.jpg", "卡内基梅隆大学盖茨-希尔曼建筑群", "CMU School of Computer Science", "https://www.cs.cmu.edu/photopages/gates.html"),
+    ],
+  },
+  "同济": {
+    location: "中国 · 上海",
+    gallery: [
+      createLocalImage("assets/universities/tongji-gate.jpg", "同济大学校园主视觉", "Tongji University", "https://en.tongji.edu.cn/"),
+      createLocalImage("assets/universities/tongji-building.jpg", "同济大学校园建筑", "Tongji University", "https://en.tongji.edu.cn/"),
+    ],
+  },
+};
+
+function applyLocalUniversityOverride(university) {
+  if (!university?.shortName) return;
+  const override = localUniversityOverrideMap[university.shortName];
+  if (!override) return;
+  if (override.location) university.location = override.location;
+  if (override.gallery?.length) {
+    university.gallery = override.gallery.map((image) => ({ ...image }));
+    university.image = university.gallery[0];
+  }
+}
+
 function renderExplorationWindow(lesson) {
   const exploration = lesson.upgraded.exploration;
   if (!exploration) return "";
@@ -4029,6 +4116,9 @@ function renderExplorationWindow(lesson) {
   const science = exploration.science;
   const universityCopy = universityPrimer(university);
   const scienceCopy = sciencePrimer(exploration);
+  const universityImages = getGalleryImages(university);
+  const heroUniversityImage = universityImages[0] || university.image;
+  const detailUniversityImage = universityImages[1] || null;
 
   return `
     <section class="exploration-window" aria-label="今日世界探索">
@@ -4043,7 +4133,7 @@ function renderExplorationWindow(lesson) {
           <p class="exploration-voice">今天这一课，不只是做题。你会像真正的小小探索员一样，先观察，再猜想，最后用数学把线索连起来。</p>
         </div>
         <div class="exploration-hero-image">
-          <img src="${esc(university.image.url)}" alt="${esc(university.image.alt)}" loading="lazy" />
+          <img src="${esc(heroUniversityImage.url)}" alt="${esc(heroUniversityImage.alt)}" loading="lazy" />
           <div class="exploration-stamp">
             <strong>${esc(university.name)}</strong>
             <span>${esc(university.location)}</span>
@@ -4066,10 +4156,12 @@ function renderExplorationWindow(lesson) {
         </div>
       </div>
 
-      <section class="exploration-detail university-detail">
+      <section class="exploration-detail university-detail ${detailUniversityImage ? "" : "no-media"}">
+        ${detailUniversityImage ? `
         <div class="exploration-detail-media">
-          <img src="${esc(university.image.url)}" alt="${esc(university.image.alt)}" loading="lazy" />
+          <img src="${esc(detailUniversityImage.url)}" alt="${esc(detailUniversityImage.alt)}" loading="lazy" />
         </div>
+        ` : ""}
         <div class="exploration-detail-copy">
           <span class="kid-label">今日大学明信片</span>
           <h3>${esc(university.name)}</h3>
@@ -4079,7 +4171,7 @@ function renderExplorationWindow(lesson) {
             <li>${esc(universityCopy.notice)}</li>
             <li>${esc(universityCopy.dream)}</li>
           </ul>
-          <div class="image-credit">${renderImageCredit(university.image)}</div>
+          <div class="image-credit">${renderImageCredit(detailUniversityImage || heroUniversityImage)}</div>
         </div>
       </section>
 
@@ -4134,15 +4226,11 @@ Object.assign(localExplorationImageMap, {
   "Curiosity Self-Portrait at 'Big Sky' Drilling Site.jpg": "assets/science/space-explore.svg",
   "FANUC_6-axis_welding_robots.jpg": "assets/science/robot-lab.svg",
   "Apollo_11_Launch_-_GPN-2000-000630.jpg": "assets/science/space-explore.svg",
-  "Colored_neural_network.svg": "assets/science/neural-network.svg",
   "Solar_array-3.jpg": "assets/science/solar-grid.svg",
   "Golden_Gate_Bridge_as_seen_from_Battery_East.jpg": "assets/science/bridge-blueprint.svg",
   "Animal_diversity.png": "assets/science/animal-study.svg",
   "The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg": "assets/science/space-explore.svg",
-  "Clock_simple.svg": "assets/science/clock-measure.svg",
-  "Athletics_pictogram.svg": "assets/science/sports-track.svg",
   "OSIRIS_Mars_true_color.jpg": "assets/science/mars-surface.svg",
-  "Openstreetmap_logo.svg": "assets/science/route-map.svg",
 });
 
 function localizeExplorationImage(image) {
@@ -4157,6 +4245,7 @@ function localizeExplorationImages() {
     const exploration = lesson.upgraded?.exploration;
     if (!exploration) return;
     localizeExplorationImage(exploration.university?.image);
+    applyLocalUniversityOverride(exploration.university);
     localizeExplorationImage(exploration.science?.image);
   });
 }
